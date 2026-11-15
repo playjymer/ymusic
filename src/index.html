@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Яндекс Музыка</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <!-- WORKSTATION CONSOLE (100% Fixed, Zero Page Scroll) -->
+    <div class="app-window">
+      
+      <!-- CUSTOM WINDOW TITLEBAR & CONTROLS -->
+      <header class="custom-titlebar" data-tauri-drag-region>
+        <div class="titlebar-left" data-tauri-drag-region>
+          <div class="app-brand" data-tauri-drag-region>
+            <span class="brand-dot"></span>
+            <span class="brand-text">Яндекс Музыка</span>
+          </div>
+          <div class="active-flow-badge" id="titlebar-station-badge">
+            <span class="flow-dot"></span>
+            <span id="titlebar-station-name">МОЯ ВОЛНА</span>
+          </div>
+        </div>
+
+        <div class="titlebar-center" data-tauri-drag-region></div>
+
+        <div class="titlebar-right">
+          <!-- Settings & EQ Button -->
+          <button class="titlebar-settings-btn" id="btn-open-settings" title="Настройки и Студийный Эквалайзер">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Настройки</span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="user-pill" id="user-pill">
+            <img id="user-avatar-img" src="assets/default-cover.svg" class="user-avatar-small" alt="Avatar" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+            <span id="user-display-name" class="user-name-text">Загрузка...</span>
+            <span class="plus-mini-star" title="Яндекс Плюс">★</span>
+          </div>
+
+          <!-- Windows Control Buttons (Modern High-Craft Desktop Styling) -->
+          <div class="window-controls">
+            <button class="win-action-btn win-min" id="win-min-btn" aria-label="Свернуть окно" title="Свернуть">
+              <svg width="10" height="2" viewBox="0 0 10 2"><rect width="10" height="2" rx="1" fill="currentColor"/></svg>
+            </button>
+            <button class="win-action-btn win-max" id="win-max-btn" aria-label="Развернуть окно" title="Развернуть">
+              <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0.75" y="0.75" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+            <button class="win-action-btn win-close" id="win-close-btn" aria-label="Закрыть приложение" title="Закрыть">
+              <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1.5 1.5L8.5 8.5M8.5 1.5L1.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN 3-PANEL LAYOUT -->
+      <div class="console-body">
+
+        <!-- PANEL 1: LEFT SIDEBAR (Redesigned & Organized) -->
+        <aside class="sidebar-panel">
+          <!-- Main Sections -->
+          <div class="menu-section">
+            <div class="menu-label">ГЛАВНАЯ</div>
+            <button class="menu-item active" data-tab="wave" data-station="user:onyourwave" data-name="Моя волна">
+              <span class="menu-icon">🌊</span>
+              <span>Моя волна</span>
+              <span class="pulse-indicator"></span>
+            </button>
+            <button class="menu-item" data-tab="wave" data-station="personal:never-heard" data-name="Открытия">
+              <span class="menu-icon">✨</span>
+              <span>Открытия</span>
+            </button>
+            <button class="menu-item" data-tab="wave" data-station="personal:hits" data-name="Хиты">
+              <span class="menu-icon">🔥</span>
+              <span>Хиты</span>
+            </button>
+          </div>
+
+          <!-- Library Section -->
+          <div class="menu-section">
+            <div class="menu-label">КОЛЛЕКЦИЯ</div>
+            <button class="menu-item" data-tab="favorites">
+              <span class="menu-icon">❤️</span>
+              <span>Любимые треки</span>
+            </button>
+            <button class="menu-item" data-tab="search">
+              <span class="menu-icon">🔍</span>
+              <span>Поиск</span>
+            </button>
+          </div>
+
+          <!-- Vibe / Mood Section -->
+          <div class="menu-section mood-section">
+            <div class="menu-label">НАСТРОЕНИЕ И ВАЙБ</div>
+            <div class="mood-pills-list">
+              <button class="vibe-pill" data-station="mood:energetic" data-name="Энергия">
+                <span>⚡</span><span>Энергия</span>
+              </button>
+              <button class="vibe-pill" data-station="mood:calm" data-name="Спокойствие">
+                <span>🍃</span><span>Спокойствие</span>
+              </button>
+              <button class="vibe-pill" data-station="activity:work-background" data-name="Фокус">
+                <span>💻</span><span>Фокус</span>
+              </button>
+              <button class="vibe-pill" data-station="activity:workout" data-name="Тренировка">
+                <span>💪</span><span>Тренировка</span>
+              </button>
+              <button class="vibe-pill" data-station="activity:driving" data-name="В дороге">
+                <span>🚗</span><span>В дороге</span>
+              </button>
+              <button class="vibe-pill" data-station="mood:happy" data-name="Радость">
+                <span>☀️</span><span>Радость</span>
+              </button>
+              <button class="vibe-pill" data-station="mood:sad" data-name="Грусть">
+                <span>🌧️</span><span>Грусть</span>
+              </button>
+              <button class="vibe-pill" data-station="local-language:russian" data-name="Русское">
+                <span>🇷🇺</span><span>Русское</span>
+              </button>
+              <button class="vibe-pill" data-station="local-language:instrumental" data-name="Без слов">
+                <span>🎻</span><span>Без слов</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Master Volume Slider -->
+          <div class="sidebar-volume-dock">
+            <div class="vol-title-row">
+              <span>ГРОМКОСТЬ</span>
+              <span id="vol-percent-text" class="vol-percent">80%</span>
+            </div>
+            <div class="vol-controls-line">
+              <button id="vol-mute-btn" class="mute-btn" title="Звук (M)">🔊</button>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" />
+            </div>
+          </div>
+        </aside>
+
+        <!-- PANEL 2: CENTER AUDIO STAGE -->
+        <main class="stage-panel">
+          
+          <div class="stage-views-area">
+            <!-- VIEW: MY WAVE -->
+            <div id="view-wave" class="tab-view active">
+              <!-- Organic Visualizer Stage (Fluid Aurora Soundwave & Studio RTA) -->
+              <div class="visualizer-container">
+                <div class="visualizer-header">
+                  <div class="vis-status-tag">
+                    <span class="vis-indicator-dot"></span>
+                    <span class="vis-status-text" id="vis-status-label">ЖИВОЙ АУДИОПОТОК</span>
+                  </div>
+                  <div class="vis-mode-switch">
+                    <button class="vis-toggle-btn active" id="btn-vis-wave" title="Режим: Органическая волна">
+                      <span>🌊</span><span>Волна</span>
+                    </button>
+                    <button class="vis-toggle-btn" id="btn-vis-spectrum" title="Режим: Неоновый спектр">
+                      <span>📊</span><span>Спектр</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="visualizer-canvas-wrap">
+                  <canvas id="spectrum-canvas" width="720" height="130"></canvas>
+                </div>
+              </div>
+
+              <!-- Central Track Identity Deck -->
+              <div class="track-identity-deck">
+                <div class="cover-wrapper" id="cover-wrapper">
+                  <img id="track-cover-main" src="assets/default-cover.svg" alt="Cover" class="cover-main-img" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+                  <div class="cover-glow-shadow" id="cover-glow"></div>
+                </div>
+
+                <div class="track-info-deck">
+                  <div class="station-kicker" id="hero-station-label">ВОЛНА: МОЯ ВОЛНА</div>
+                  <h1 id="track-title-main" class="track-title-heading">Запустите волну</h1>
+                  <p id="track-artist-main" class="track-artist-heading">Нажмите плей для старта музыки</p>
+                  <div class="track-album-sub" id="track-album-main"></div>
+
+                  <!-- Action Buttons -->
+                  <div class="track-action-buttons">
+                    <button id="btn-launch-wave" class="btn-action-primary" title="Включить персональный бесконечный поток музыки">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                      </svg>
+                      <span>Запустить Мою волну</span>
+                    </button>
+
+                    <button id="btn-wave-by-track" class="btn-action-round" title="Запустить Мою волну на основе текущего трека">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12c1.5-2 3-3 4.5-3s3 2 4.5 3 3 1 4.5 0 3-3 4.5-3 3 2 4 3"></path>
+                        <path d="M2 17c1.5-2 3-3 4.5-3s3 2 4.5 3 3 1 4.5 0 3-3 4.5-3 3 2 4 3"></path>
+                      </svg>
+                      <span>Волна по треку</span>
+                    </button>
+
+                    <button id="btn-like-main" class="btn-action-round" title="Мне нравится (L)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                      </svg>
+                      <span>Нравится</span>
+                    </button>
+
+                    <button id="btn-dislike-main" class="btn-action-round" title="Не рекомендовать">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                      </svg>
+                      <span>Не моё</span>
+                    </button>
+
+                    <button id="btn-main-lyrics" class="btn-action-round btn-lyrics-pill" title="Открыть текст песни на весь экран (T)">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                      </svg>
+                      <span>Текст песни</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: SEARCH -->
+            <div id="view-search" class="tab-view">
+              <div class="search-command-input">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="Поиск треков, артистов или альбомов..." autocomplete="off" />
+                <button id="search-clear-btn" class="search-clear-btn" style="display:none;">✕</button>
+              </div>
+              <div id="search-results-list" class="track-scroll-grid">
+                <div class="empty-state-notice">Начните ввод для мгновенного поиска по каталогу</div>
+              </div>
+            </div>
+
+            <!-- VIEW: FAVORITES -->
+            <div id="view-favorites" class="tab-view">
+              <div class="favorites-hero-banner">
+                <div class="fav-icon-emblem">❤️</div>
+                <div class="fav-header-info">
+                  <h2>Мне нравится</h2>
+                  <p id="fav-count-banner">Загрузка треков...</p>
+                </div>
+                <div class="fav-hero-actions">
+                  <button id="btn-fav-play-all" class="fav-action-btn primary" title="Воспроизвести все треки по порядку">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <span>По порядку</span>
+                  </button>
+                  <button id="btn-fav-shuffle" class="fav-action-btn" title="Слушать избранное в случайном порядке">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="16 3 21 3 21 8"></polyline>
+                      <line x1="4" y1="20" x2="21" y2="3"></line>
+                      <polyline points="21 16 21 21 16 21"></polyline>
+                      <line x1="15" y1="15" x2="21" y2="21"></line>
+                      <line x1="4" y1="4" x2="9" y2="9"></line>
+                    </svg>
+                    <span>Перемешать</span>
+                  </button>
+                </div>
+              </div>
+              <div id="favorites-results-list" class="track-scroll-grid">
+                <div class="empty-state-notice">Загрузка избранных треков...</div>
+              </div>
+            </div>
+
+            <!-- VIEW: ARTIST PAGE -->
+            <div id="view-artist" class="tab-view">
+              <div class="artist-hero-banner">
+                <div class="artist-avatar-wrapper">
+                  <img id="artist-cover-img" src="assets/default-cover.svg" class="artist-cover-avatar" alt="Artist" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+                  <div class="artist-avatar-glow" id="artist-avatar-glow"></div>
+                </div>
+                <div class="artist-meta-info">
+                  <div class="artist-badge-kicker">ИСПОЛНИТЕЛЬ</div>
+                  <h1 id="artist-name-heading" class="artist-title-heading">Загрузка...</h1>
+                  <div id="artist-genres-tags" class="artist-genres-list"></div>
+                  <p id="artist-counts-stat" class="artist-stat-text"></p>
+                  
+                  <!-- Artist Action Bar -->
+                  <div class="artist-actions-row">
+                    <button id="btn-artist-play-popular" class="btn-action-primary" title="Включить популярные треки артиста">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                      <span>Слушать популярное</span>
+                    </button>
+                    <button id="btn-artist-wave" class="btn-action-wave" title="Запустить бесконечный поток музыки в стиле этого артиста">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12c1.5-2 3-3 4.5-3s3 2 4.5 3 3 1 4.5 0 3-3 4.5-3 3 2 4 3"></path>
+                      </svg>
+                      <span>Моя волна по артисту</span>
+                    </button>
+                    <button id="btn-artist-shuffle" class="btn-action-round" title="Случайный порядок треков артиста">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg>
+                      <span>Перемешать</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Artist Navigation Tabs -->
+              <div class="artist-tabs-bar">
+                <button class="artist-tab-btn active" id="tab-art-popular">Популярные треки</button>
+                <button class="artist-tab-btn" id="tab-art-recent">Все треки (по новизне)</button>
+                <button class="artist-tab-btn" id="tab-art-albums">Альбомы и синглы</button>
+              </div>
+
+              <!-- Artist Tracks Grid -->
+              <div id="artist-tracks-container" class="track-scroll-grid">
+                <!-- Dynamically populated via JS -->
+              </div>
+
+              <!-- Artist Albums Grid -->
+              <div id="artist-albums-container" class="albums-scroll-grid" style="display: none;">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- PERSISTENT UNIVERSAL TRANSPORT DOCK (Always visible in all tabs!) -->
+          <div class="transport-dock" id="persistent-transport-dock">
+            <div class="dock-layout">
+              <!-- Left: Now Playing Mini Deck -->
+              <div class="dock-now-playing" id="dock-now-playing">
+                <img id="dock-thumb" src="assets/default-cover.svg" class="dock-thumb-img" alt="Cover" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+                <div class="dock-meta">
+                  <div id="dock-title" class="dock-title-text">Запустите трек</div>
+                  <div id="dock-artist" class="dock-artist-text">Яндекс Музыка</div>
+                </div>
+                <button id="dock-like-btn" class="dock-mini-like" title="Мне нравится (L)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Center / Right: Transport & Hardware Scrubber -->
+              <div class="dock-controls-block">
+                <!-- Main Transport Buttons (Старт, Стоп, Листать, Перемешать, DJ Режим, Дроп) -->
+                <div class="transport-buttons">
+                  <button id="btn-dj" class="transport-btn btn-dj active" title="Режим Диджея: умное сведение по фразам">
+                    <span class="dj-badge-label">DJ</span>
+                  </button>
+
+                  <button id="btn-dj-drop" class="transport-btn btn-dj-drop" title="Свести прямо сейчас через клубный дроп (Клавиша D)">
+                    <span class="dj-drop-label">⚡ ДРОП</span>
+                  </button>
+
+                  <button id="btn-shuffle" class="transport-btn" title="Случайный порядок (S)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="16 3 21 3 21 8"></polyline>
+                      <line x1="4" y1="20" x2="21" y2="3"></line>
+                      <polyline points="21 16 21 21 16 21"></polyline>
+                      <line x1="15" y1="15" x2="21" y2="21"></line>
+                      <line x1="4" y1="4" x2="9" y2="9"></line>
+                    </svg>
+                  </button>
+
+                  <button id="btn-prev" class="transport-btn" title="Предыдущий трек / Листать назад (Ctrl+Left)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                      <line x1="5" y1="19" x2="5" y2="5"></line>
+                    </svg>
+                  </button>
+
+                  <button id="btn-play-pause" class="play-hero-btn" title="Старт / Стоп (Пробел)">
+                    <svg id="play-pause-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="8 5 19 12 8 19"></polygon>
+                    </svg>
+                  </button>
+
+                  <button id="btn-next" class="transport-btn" title="Следующий трек / Листать вперёд (Ctrl+Right)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                      <line x1="19" y1="5" x2="19" y2="19"></line>
+                    </svg>
+                  </button>
+
+                  <button id="btn-dock-lyrics" class="transport-btn btn-dock-lyrics" title="Текст песни на весь экран (Клавиша T)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Hardware Scrubber Bar -->
+                <div class="scrubber-line">
+                  <span id="time-current" class="time-readout">0:00</span>
+                  <div class="scrubber-trough" id="progress-container">
+                    <div class="scrubber-active" id="progress-fill"></div>
+                    <div class="scrubber-handle" id="progress-thumb"></div>
+                  </div>
+                  <span id="time-total" class="time-readout">0:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+      </div>
+    </div>
+
+    <!-- Hidden Dual Native Audio Engines with CORS support for Web Audio API DJ Mixing -->
+    <audio id="audio-engine" preload="auto" crossorigin="anonymous"></audio>
+    <audio id="audio-engine-b" preload="auto" crossorigin="anonymous"></audio>
+
+    <!-- Beautiful Modern Auth Modal -->
+    <div id="token-modal" class="modal-dim-backdrop" style="display: none;">
+      <div class="modal-dialog-box auth-dialog-box">
+        <button id="auth-modal-close-btn" class="auth-modal-close" style="display: none;" title="Закрыть">✕</button>
+        <div class="auth-header-emblem">
+          <div class="yandex-badge-logo">Я</div>
+        </div>
+        
+        <h2 class="auth-modal-title">Вход в Яндекс Музыку</h2>
+        <p class="auth-modal-subtitle">Войдите через Яндекс ID, чтобы слушать Мою волну, рекомендации и любимые треки</p>
+
+        <div class="auth-primary-actions">
+          <button id="btn-oauth-login" class="btn-yandex-primary" title="Войти через официальный паспорт Яндекс">
+            <span class="yandex-icon-round">Я</span>
+            <span>Войти через Яндекс ID</span>
+          </button>
+          <div id="auth-status-indicator" class="auth-status-indicator" style="display: none;">
+            <div class="auth-spinner"></div>
+            <span>Окно входа открыто. Завершите авторизацию в Яндекс...</span>
+          </div>
+        </div>
+
+        <div class="auth-features-list">
+          <div class="auth-feat-item">
+            <span class="auth-feat-icon">📱</span>
+            <span>Вход по QR-коду из приложения Яндекс или по SMS</span>
+          </div>
+          <div class="auth-feat-item">
+            <span class="auth-feat-icon">⚡</span>
+            <span>Полный доступ к Моей волне и вашей коллекции</span>
+          </div>
+          <div class="auth-feat-item">
+            <span class="auth-feat-icon">🔒</span>
+            <span>Безопасный официальный вход на серверах Яндекс</span>
+          </div>
+        </div>
+
+        <div class="auth-manual-toggle-block">
+          <button id="btn-toggle-manual-token" class="btn-text-link">У меня есть токен (ручной ввод) ▼</button>
+          
+          <div id="manual-token-container" class="manual-token-form" style="display: none;">
+            <p class="manual-hint">Вставьте OAuth токен приложения (y0_...):</p>
+            <div class="manual-token-input-wrap">
+              <input type="password" id="modal-token-input" placeholder="y0_AgAAAA..." autocomplete="off" />
+              <button id="modal-submit-btn" class="btn-manual-submit">Войти</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings & Studio Equalizer Modal -->
+    <div id="settings-modal" class="modal-dim-backdrop" style="display: none;">
+      <div class="settings-dialog-box">
+        <div class="settings-modal-header">
+          <div class="modal-title-group">
+            <span class="modal-icon-badge">🎚️</span>
+            <div>
+              <h3>Настройки и Студийный Эквалайзер</h3>
+              <p>Аудиопроцессинг Web Audio API и параметры клиента</p>
+            </div>
+          </div>
+          <button id="settings-close-btn" class="settings-modal-close" title="Закрыть (Esc)">✕</button>
+        </div>
+
+        <div class="settings-modal-body">
+          <!-- 1. STUDIO EQUALIZER SECTION -->
+          <div class="settings-section">
+            <div class="section-headline-row">
+              <div class="section-title">10-ПОЛОСНЫЙ ПАРАМЕТРИЧЕСКИЙ ЭКВАЛАЙЗЕР</div>
+              <div class="eq-controls-right">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="eq-power-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="eq-power-label">Включён</span>
+                </label>
+                <select id="eq-preset-select" class="eq-preset-dropdown">
+                  <option value="flat">По умолчанию (Flat)</option>
+                  <option value="bass">Глубокий бас (Bass Boost)</option>
+                  <option value="edm">Клубная / EDM</option>
+                  <option value="rock">Рок и гитары</option>
+                  <option value="vocal">Чистый вокал</option>
+                  <option value="acoustic">Акустика / Классика</option>
+                  <option value="night">Ночной режим</option>
+                </select>
+                <button id="eq-reset-btn" class="eq-btn-subtle" title="Сбросить все полосы в 0 dB">Сброс</button>
+              </div>
+            </div>
+
+            <!-- 10 Vertical Faders Board -->
+            <div class="eq-sliders-board" id="eq-sliders-board">
+              <!-- Dynamically populated via JS: 32Hz, 64Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz -->
+            </div>
+          </div>
+
+          <!-- 2. STREAM & PLAYBACK SETTINGS -->
+          <div class="settings-section">
+            <div class="section-title">СВЕДЕНИЕ И DJ РЕЖИМ (SMART CROSSFADE)</div>
+            <div class="settings-options-grid">
+              <div class="setting-option-card">
+                <div class="opt-label">Режим Диджея</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-mode-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-mode-label">Включён</span>
+                </label>
+                <div class="opt-desc">Умный бесшовный переход между треками без тишины</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Длительность сведения</div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                  <input type="range" id="dj-time-slider" min="2" max="10" step="1" value="5" style="flex: 1; -webkit-appearance: auto; accent-color: #00f0ff; height: 6px;" />
+                  <span id="dj-time-val" class="opt-value-badge highlight">5 сек</span>
+                </div>
+                <div class="opt-desc">Длина наложения и построения дропа</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Умный Bass-Swap (Срез низких частот)</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-bass-swap-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-bass-label">Включён</span>
+                </label>
+                <div class="opt-desc">Срезает бас уходящего трека для чистого звучания без каши</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Умный ранний переход (Golden Mix Window)</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-early-mix-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-early-mix-label">Включён</span>
+                </label>
+                <div class="opt-desc">Сводит трек на идеальной фразе (за 25-35 сек до конца), не дожидаясь пустого затухания</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Дроп в активную часть (Drop-to-Drop)</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-drop-to-drop-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-drop-to-drop-label">Включён</span>
+                </label>
+                <div class="opt-desc">Следующий трек врывается сразу в активный бит/куплет, минуя долгое интро</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Гармонический подбор треков (BPM & Key Match)</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-harmonic-match-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-harmonic-match-label">Включён</span>
+                </label>
+                <div class="opt-desc">Выбирает следующий трек с идеальной совместимостью по BPM, вайбу и тональности</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Сведение на мелодии без слов (Vocal-Free Mix)</div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dj-vocal-free-toggle" checked />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label" id="dj-vocal-free-label">Включён</span>
+                </label>
+                <div class="opt-desc">Ловит моменты, когда нет вокала (проигрыш, соло, конец припева), чтобы свести чисто по мелодии</div>
+              </div>
+              <div class="setting-option-card" style="grid-column: span 3;">
+                <div class="opt-label">Стиль сведения треков (DJ Techniques)</div>
+                <div class="dj-style-group" id="dj-style-group">
+                  <button type="button" class="dj-style-btn active" data-style="auto">
+                    <span class="dj-style-title">✨ Smart DJ Director (Авто)</span>
+                    <span class="dj-style-desc">Диджей сам выбирает технику (бэкспин, райзер или эхо) под разницу энергетики и темпа</span>
+                  </button>
+                  <button type="button" class="dj-style-btn" data-style="slam_drop">
+                    <span class="dj-style-title">⚡ Festival Slam Drop</span>
+                    <span class="dj-style-desc">1-битный стоп, нарастающий шумовой райзер и взрывной вход бочки на 100% громкости</span>
+                  </button>
+                  <button type="button" class="dj-style-btn" data-style="spinback">
+                    <span class="dj-style-title">🌪️ Vinyl Spinback</span>
+                    <span class="dj-style-desc">Фирменный резкий скретч-раскрут пластинки назад со сменой настроения на дропе</span>
+                  </button>
+                  <button type="button" class="dj-style-btn" data-style="echo_freeze">
+                    <span class="dj-style-title">🌌 Dub Echo Freeze</span>
+                    <span class="dj-style-desc">Захват финальной фразы в BPM-эхо петлю, растворяющуюся на фоне новой мелодии</span>
+                  </button>
+                  <button type="button" class="dj-style-btn" data-style="submerge">
+                    <span class="dj-style-title">🌊 Club Submerge (LPF)</span>
+                    <span class="dj-style-desc">Погружение в глухой клубно-подвальный фильтр и раскрытие нового трека во весь диапазон</span>
+                  </button>
+                  <button type="button" class="dj-style-btn" data-style="club_drop">
+                    <span class="dj-style-title">🔥 Pioneer HPF Sweep</span>
+                    <span class="dj-style-desc">Классический резонансный срез низов со свипом до верхов и дропом на закрытии квадрата</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. AUDIO PIPELINE & QUALITY SETTINGS -->
+          <div class="settings-section">
+            <div class="section-title">ПАРАМЕТРЫ ВОСПРОИЗВЕДЕНИЯ И ЗВУКА</div>
+            <div class="settings-options-grid">
+              <div class="setting-option-card">
+                <div class="opt-label">Битрейт аудиопотока</div>
+                <div class="opt-value-badge highlight">320 KBPS MP3 (HQ)</div>
+                <div class="opt-desc">Максимальное качество звука официального стриминга Яндекса</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Аудиодвижок</div>
+                <div class="opt-value-badge">LOW-LATENCY WEBAUDIO</div>
+                <div class="opt-desc">Аппаратный сигнальный тракт BiquadFilterNode + AnalyserNode</div>
+              </div>
+              <div class="setting-option-card">
+                <div class="opt-label">Режим визуализатора</div>
+                <div class="vis-options-toggle">
+                  <button class="vis-opt-btn active" id="opt-vis-wave">Волна</button>
+                  <button class="vis-opt-btn" id="opt-vis-spec">Спектр</button>
+                </div>
+                <div class="opt-desc">Режим отображения колебаний на главном экране</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. ACCOUNT & SESSION -->
+          <div class="settings-section">
+            <div class="section-title">УЧЁТНАЯ ЗАПИСЬ</div>
+            <div class="account-settings-row">
+              <img id="settings-avatar-img" src="assets/default-cover.svg" class="settings-avatar-thumb" alt="Avatar" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+              <div class="account-details">
+                <div id="settings-user-name" class="account-name">Загрузка...</div>
+                <div class="account-status">Подписка Яндекс Плюс активна ★</div>
+              </div>
+              <div class="account-actions-group">
+                <button id="settings-switch-account-btn" class="btn-change-token" title="Войти в другой аккаунт Яндекс">Сменить аккаунт</button>
+                <button id="settings-logout-btn" class="btn-logout-danger" title="Выйти из текущей учётной записи">Выйти</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. KEYBOARD SHORTCUTS -->
+          <div class="settings-section">
+            <div class="section-title">ГОРЯЧИЕ КЛАВИШИ</div>
+            <div class="shortcuts-grid">
+              <div class="shortcut-item"><kbd>Пробел</kbd><span>Воспроизведение / Пауза</span></div>
+              <div class="shortcut-item"><kbd>Ctrl + →</kbd><span>Следующий трек</span></div>
+              <div class="shortcut-item"><kbd>Ctrl + ←</kbd><span>Предыдущий трек</span></div>
+              <div class="shortcut-item"><kbd>→</kbd> / <kbd>←</kbd><span>Перемотка на 5 секунд</span></div>
+              <div class="shortcut-item"><kbd>↑</kbd> / <kbd>↓</kbd><span>Громкость громче / тише</span></div>
+              <div class="shortcut-item"><kbd>S</kbd><span>Случайный порядок (Shuffle)</span></div>
+              <div class="shortcut-item"><kbd>L</kbd><span>Мне нравится (Лайк)</span></div>
+              <div class="shortcut-item"><kbd>M</kbd><span>Заглушить звук (Mute)</span></div>
+              <div class="shortcut-item"><kbd>T</kbd><span>Текст на весь экран (Spotify режим)</span></div>
+              <div class="shortcut-item"><kbd>Esc</kbd><span>Закрыть окна и модалки</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULLSCREEN SPOTIFY-STYLE ATMOSPHERIC LYRICS OVERLAY -->
+    <div id="fullscreen-lyrics-overlay" class="fs-lyrics-overlay" style="display: none;">
+      <!-- Dynamic Ambient Color Aura -->
+      <div class="fs-lyrics-backdrop" id="fs-lyrics-backdrop"></div>
+      <div class="fs-lyrics-mesh-glow"></div>
+
+      <!-- Header with Track Identity & Exit Button -->
+      <header class="fs-lyrics-header">
+        <div class="fs-lyrics-track-info">
+          <img id="fs-lyrics-cover" src="assets/default-cover.svg" class="fs-lyrics-cover" alt="" />
+          <div class="fs-lyrics-meta">
+            <h2 id="fs-lyrics-title" class="fs-lyrics-title">Трек</h2>
+            <p id="fs-lyrics-artist" class="fs-lyrics-artist">Исполнитель</p>
+          </div>
+        </div>
+
+        <div class="fs-lyrics-header-actions">
+          <span class="fs-lyrics-pill" id="fs-lyrics-pill">✨ СИНХРОНИЗИРОВАНО</span>
+          <button id="btn-close-fs-lyrics" class="fs-lyrics-close-btn" title="Выйти (Esc или T)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Center Stage: Butter-Smooth GPU-Translated Scroller -->
+      <div class="fs-lyrics-stage" id="fs-lyrics-stage">
+        <div class="fs-lyrics-scroller" id="fs-lyrics-scroller">
+          <div class="fs-lyrics-placeholder">Загрузка текста песни...</div>
+        </div>
+      </div>
+
+      <!-- Floating Minimalist Transport Bar -->
+      <footer class="fs-lyrics-footer">
+        <div class="fs-lyrics-controls">
+          <button id="fs-btn-prev" class="fs-ctrl-btn" title="Предыдущий трек">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polygon points="19 20 9 12 19 4 19 20"></polygon>
+              <line x1="5" y1="19" x2="5" y2="5"></line>
+            </svg>
+          </button>
+          <button id="fs-btn-play" class="fs-play-btn" title="Воспроизведение / Пауза (Пробел)">
+            <svg id="fs-play-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="8 5 19 12 8 19"></polygon>
+            </svg>
+          </button>
+          <button id="fs-btn-next" class="fs-ctrl-btn" title="Следующий трек">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="fs-scrubber-line">
+          <span id="fs-time-current" class="time-readout">0:00</span>
+          <div class="scrubber-trough" id="fs-progress-container">
+            <div class="scrubber-active" id="fs-progress-fill"></div>
+          </div>
+          <span id="fs-time-total" class="time-readout">0:00</span>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
