@@ -818,10 +818,30 @@ async function loadLyricsForTrack(track) {
       });
     }
 
+    // Helper: Wrap text into word containers and individual characters for wrapped-line immune karaoke
+    function formatLyricLineToWordsAndChars(text) {
+      if (!text) return { html: '', count: 0 };
+      const parts = text.split(/(\s+)/);
+      let charCounter = 0;
+      const html = parts.map(part => {
+        if (!part) return '';
+        if (/^\s+$/.test(part)) {
+          return ' ';
+        }
+        const charsHtml = Array.from(part).map(ch => {
+          const ci = charCounter++;
+          return `<span class="char" data-ci="${ci}">${escapeHtml(ch)}</span>`;
+        }).join('');
+        return `<span class="lyric-word">${charsHtml}</span>`;
+      }).join('');
+      return { html, count: charCounter };
+    }
+
     // 2. Render Fullscreen Spotify-Style Lyrics
     if (fsScroller) {
       fsScroller.innerHTML = data.lines.map((line, idx) => {
-        return `<div class="fs-lyric-line" data-time="${line.time}" data-index="${idx}">${escapeHtml(line.text)}</div>`;
+        const parsed = formatLyricLineToWordsAndChars(line.text);
+        return `<div class="fs-lyric-line" data-time="${line.time}" data-index="${idx}" data-total-chars="${parsed.count}">${parsed.html}</div>`;
       }).join('');
 
       fsScroller.querySelectorAll('.fs-lyric-line').forEach(el => {
@@ -879,7 +899,7 @@ function updateLyricsHighlight(curTime) {
 
     if (fsLines && fsLines.length > 0) {
       // Calculate smooth character sweep progress for active singing line
-      let linePct = '0%';
+      let p = 0;
       if (activeIdx >= 0 && activeIdx < lines.length) {
         const curLine = lines[activeIdx];
         const nextLine = lines[activeIdx + 1];
@@ -888,23 +908,56 @@ function updateLyricsHighlight(curTime) {
         const naturalDur = Math.max(1.8, (curLine.text || '').length * 0.18);
         const interval = nextLine ? Math.max(0.6, nextLine.time - lineStart) : naturalDur;
         const effectiveDur = Math.max(0.6, Math.min(interval, Math.max(1.8, naturalDur)));
-        const p = Math.min(1, Math.max(0, (curTime - lineStart) / effectiveDur));
-        linePct = (p * 100).toFixed(1) + '%';
+        p = Math.min(1, Math.max(0, (curTime - lineStart) / effectiveDur));
       }
 
       fsLines.forEach((el, i) => {
         if (i === activeIdx) {
-          el.classList.add('active');
-          el.classList.remove('past');
-          el.style.setProperty('--line-pct', linePct);
+          if (!el.classList.contains('active')) {
+            el.classList.add('active');
+            el.classList.remove('past');
+            el._lastFilledIndex = -1;
+          }
+
+          const totalChars = parseInt(el.dataset.totalChars || '0', 10);
+          if (totalChars > 0) {
+            const currentPos = p * totalChars;
+            const filledIndex = Math.min(totalChars, Math.floor(currentPos));
+
+            if (el._lastFilledIndex !== filledIndex) {
+              el._lastFilledIndex = filledIndex;
+              if (!el._chars) {
+                el._chars = el.querySelectorAll('.char');
+              }
+              const chars = el._chars;
+              for (let c = 0; c < chars.length; c++) {
+                if (c < filledIndex) {
+                  chars[c].className = 'char char-active';
+                } else if (c === filledIndex && p < 1) {
+                  chars[c].className = 'char char-active char-current';
+                } else {
+                  chars[c].className = 'char';
+                }
+              }
+            }
+          }
         } else if (i < activeIdx) {
-          el.classList.remove('active');
-          el.classList.add('past');
-          el.style.setProperty('--line-pct', '100%');
+          if (!el.classList.contains('past')) {
+            el.classList.remove('active');
+            el.classList.add('past');
+            el._lastFilledIndex = -1;
+          }
         } else {
-          el.classList.remove('active');
-          el.classList.remove('past');
-          el.style.setProperty('--line-pct', '0%');
+          if (el.classList.contains('active') || el.classList.contains('past')) {
+            el.classList.remove('active');
+            el.classList.remove('past');
+            el._lastFilledIndex = -1;
+            if (el._chars) {
+              for (let c = 0; c < el._chars.length; c++) {
+                el._chars[c].className = 'char';
+              }
+            }
+          }
         }
       });
 

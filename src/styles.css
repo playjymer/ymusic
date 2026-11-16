@@ -3043,37 +3043,50 @@ html, body {
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
   will-change: transform;
   
-  /* Continuous Left-to-Right Karaoke Character Sweep */
-  --line-pct: 0%;
-  background: linear-gradient(
-    90deg,
-    #ffffff 0%,
-    #ffffff var(--line-pct, 0%),
-    rgba(255, 255, 255, 0.28) calc(var(--line-pct, 0%) + 1.2%),
-    rgba(255, 255, 255, 0.28) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
-  display: inline-block;
+  display: block;
 }
 
 .fs-lyric-line:hover {
   transform: translateX(4px);
-  opacity: 0.95;
 }
 
+.fs-lyric-line .lyric-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.fs-lyric-line .char {
+  display: inline;
+  color: rgba(255, 255, 255, 0.28);
+  transition: color 0.12s ease, text-shadow 0.15s ease;
+}
+
+/* Active Singing Line */
 .fs-lyric-line.active {
   transform: scale(1.025);
   transform-origin: left center;
   filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.75));
 }
 
+.fs-lyric-line.active .char.char-active {
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.6), 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.fs-lyric-line.active .char.char-current {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.95), 0 0 8px #ffffff;
+}
+
+/* Past Line (Already Sung) */
 .fs-lyric-line.past {
-  --line-pct: 100% !important;
-  opacity: 0.65;
+  opacity: 0.60;
   transform: none;
+}
+
+.fs-lyric-line.past .char {
+  color: #ffffff;
+  text-shadow: none;
 }
 
 .fs-lyrics-placeholder {
