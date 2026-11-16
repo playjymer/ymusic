@@ -493,7 +493,7 @@ function updateStationDisplay() {
     titlebarStationName.textContent = label;
   }
   if (heroStationLabel) {
-    heroStationLabel.textContent = label;
+    heroStationLabel.textContent = `ИСТОЧНИК: ${label.toUpperCase()}`;
   }
 }
 
@@ -598,7 +598,7 @@ function setTrackPreview(track, direction = 'next') {
     }
   });
 
-  trackAlbumMain.textContent = track.album ? `Альбом: ${track.album}` : '';
+  trackAlbumMain.textContent = track.album ? `АЛЬБОМ: ${track.album.toUpperCase()}` : '';
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
   // Sync Universal Bottom Dock
@@ -1810,6 +1810,11 @@ function updatePlayState(playing) {
     heroPlayIcon.innerHTML = playing ? pauseSvg : playSvg;
   }
 
+  const heroPlayText = document.getElementById('hero-play-text');
+  if (heroPlayText) {
+    heroPlayText.textContent = playing ? 'Пауза' : (currentTrack ? 'Продолжить' : 'Запустить Мою волну');
+  }
+
   const fsPlayIcon = document.getElementById('fs-play-icon');
   if (fsPlayIcon) {
     fsPlayIcon.innerHTML = playing ? pauseSvg : playSvg;
@@ -2351,12 +2356,19 @@ async function toggleCurrentLike() {
 }
 
 function updateLikeState(liked) {
-  if (liked) {
-    btnLikeMain.classList.add('liked');
-    if (dockLikeBtn) dockLikeBtn.classList.add('liked');
-  } else {
-    btnLikeMain.classList.remove('liked');
-    if (dockLikeBtn) dockLikeBtn.classList.remove('liked');
+  if (btnLikeMain) {
+    btnLikeMain.classList.toggle('liked', liked);
+    const heroLikeText = document.getElementById('hero-like-text');
+    if (heroLikeText) {
+      heroLikeText.textContent = liked ? 'В любимых' : 'Нравится';
+    }
+    const heroLikeIcon = document.getElementById('hero-like-icon');
+    if (heroLikeIcon) {
+      heroLikeIcon.setAttribute('fill', liked ? '#ff3b30' : 'none');
+    }
+  }
+  if (dockLikeBtn) {
+    dockLikeBtn.classList.toggle('liked', liked);
   }
 }
 
@@ -3461,23 +3473,27 @@ function setupSpectrumVisualizer() {
 
   // 1. LIVING ORGANIC SOUNDWAVE (Fluid Bezier ribbon sharply reactive to beat)
   function renderLivingAuroraWave(w, h, active, hasReal, bass, mids, highs, freqs, isBeat, beatDelta) {
-    const baseline = h * 0.58;
-    const maxAmp = active ? h * 0.46 : h * 0.08;
+    const baseline = h * 0.64;
+    const maxAmp = active ? h * 0.44 : h * 0.08;
+    const topMargin = 14;
+    const bottomMargin = 12;
+    const maxSafeSwell = baseline - topMargin;
+    const minSafeSwell = -(h - baseline - bottomMargin);
 
     // Ambient floating particles responding softly to bass
     for (let i = 0; i < particles.length; i++) {
       const pt = particles[i];
-      pt.y -= pt.speedY * (active ? (1 + bass * 2.5 + (isBeat ? 1.5 : 0)) : 0.4);
+      pt.y -= pt.speedY * (active ? (1 + bass * 2.2 + (isBeat ? 1.2 : 0)) : 0.4);
       pt.x += pt.driftX;
-      if (pt.y < 0) {
-        pt.y = 1;
+      if (pt.y < 0.04) {
+        pt.y = 0.96;
         pt.x = Math.random();
       }
       if (pt.x < 0) pt.x = 1;
       if (pt.x > 1) pt.x = 0;
 
       const px = pt.x * w;
-      const py = pt.y * h;
+      const py = Math.max(topMargin, Math.min(h - bottomMargin, pt.y * h));
       const alpha = pt.opacity * (active ? (0.25 + bass * 0.55) : 0.12) * (0.8 + 0.2 * Math.sin(time * 2 + pt.pulsePhase));
 
       specCtx.beginPath();
@@ -3507,21 +3523,22 @@ function setupSpectrumVisualizer() {
 
         // Harmonic fluid ripple
         const primaryPhase = time * 2.2 + normIdx * 5.0;
-        const ripple = Math.sin(primaryPhase) * 0.16 * (mids + highs * 0.8);
+        const ripple = Math.sin(primaryPhase) * 0.15 * (mids + highs * 0.7);
 
         // Punchy beat kick thrust
-        const kickThrust = isBeat ? (beatDelta * 2.4 + bass * 0.35) : 0;
-        const swell = (bandMag * 0.70 + bass * 0.35 + kickThrust + ripple) * windowEnv * maxAmp;
-        targetPrimary = swell;
+        const kickThrust = isBeat ? Math.min(0.65, beatDelta * 1.6 + bass * 0.3) : 0;
+        const rawSwell = (bandMag * 0.65 + bass * 0.30 + kickThrust + ripple) * windowEnv * maxAmp;
+        targetPrimary = Math.max(minSafeSwell, Math.min(maxSafeSwell, rawSwell));
 
         // Subtle secondary atmospheric layer with gentle phase offset
         const backPhase = time * 1.8 + normIdx * 4.2 + 0.6;
         const backRipple = Math.cos(backPhase) * 0.14 * mids;
-        targetBack = (bandMag * 0.50 + bass * 0.20 + (isBeat ? kickThrust * 0.6 : 0) + backRipple) * windowEnv * (maxAmp * 0.75);
+        const rawBack = (bandMag * 0.45 + bass * 0.18 + (isBeat ? kickThrust * 0.5 : 0) + backRipple) * windowEnv * (maxAmp * 0.72);
+        targetBack = Math.max(minSafeSwell, Math.min(maxSafeSwell, rawBack));
       } else if (active) {
         // Resting gentle harmonic breath when paused or starting
-        targetPrimary = Math.sin(time * 1.5 + normIdx * 4.2) * maxAmp * 0.22 * windowEnv;
-        targetBack = Math.cos(time * 1.2 + normIdx * 3.8) * maxAmp * 0.16 * windowEnv;
+        targetPrimary = Math.sin(time * 1.5 + normIdx * 4.2) * maxAmp * 0.20 * windowEnv;
+        targetBack = Math.cos(time * 1.2 + normIdx * 3.8) * maxAmp * 0.15 * windowEnv;
       }
 
       // Snappy attack on beat (0.88) + brisk decay (0.24) so it punches clearly to the beat
@@ -3535,13 +3552,15 @@ function setupSpectrumVisualizer() {
       waveHeightsBack[i] += (targetBack - waveHeightsBack[i]) * fBack;
     }
 
-    // Convert nodes to 2D coordinates
+    // Convert nodes to 2D coordinates with strict bounds safety
     const primaryPoints = [];
     const backPoints = [];
     for (let i = 0; i < waveNodes; i++) {
       const x = (i / (waveNodes - 1)) * w;
-      primaryPoints.push({ x, y: baseline - waveHeights[i] });
-      backPoints.push({ x, y: baseline - waveHeightsBack[i] });
+      const primY = Math.max(topMargin, Math.min(h - bottomMargin, baseline - waveHeights[i]));
+      const backY = Math.max(topMargin, Math.min(h - bottomMargin, baseline - waveHeightsBack[i]));
+      primaryPoints.push({ x, y: primY });
+      backPoints.push({ x, y: backY });
     }
 
     // Helper: draw smooth Bezier curve through points
