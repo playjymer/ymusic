@@ -1754,6 +1754,11 @@ function updatePlayState(playing) {
   const pauseSvg = '<rect x="6" y="4" width="3.5" height="16" rx="1.5"></rect><rect x="14.5" y="4" width="3.5" height="16" rx="1.5"></rect>';
   playPauseIcon.innerHTML = playing ? pauseSvg : playSvg;
 
+  const heroPlayIcon = document.getElementById('hero-play-icon');
+  if (heroPlayIcon) {
+    heroPlayIcon.innerHTML = playing ? pauseSvg : playSvg;
+  }
+
   const fsPlayIcon = document.getElementById('fs-play-icon');
   if (fsPlayIcon) {
     fsPlayIcon.innerHTML = playing ? pauseSvg : playSvg;
@@ -2180,6 +2185,10 @@ function setupAudioEvents() {
 
   // Buttons
   btnPlayPause.addEventListener('click', togglePlayPause);
+  const btnHeroPlay = document.getElementById('btn-hero-play');
+  if (btnHeroPlay) {
+    btnHeroPlay.addEventListener('click', togglePlayPause);
+  }
   btnNext.addEventListener('click', () => {
     if (currentSourceMode === 'wave') {
       sendFeedback('skip');

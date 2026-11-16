@@ -915,95 +915,103 @@ html, body {
 .track-action-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.btn-action-primary {
-  display: inline-flex;
+/* Big Hero Play/Pause Button (Spotify/Yandex Music style) */
+.btn-hero-play {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fc3f1d 0%, #ff5e3a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 22px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #fc3f1d 0%, #ff5e3a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(252, 63, 29, 0.4);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
+  box-shadow: 0 4px 18px rgba(252, 63, 29, 0.45);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+  outline: none;
 }
 
-.btn-action-primary:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 22px rgba(252, 63, 29, 0.55);
+.btn-hero-play:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(252, 63, 29, 0.65);
   background: linear-gradient(135deg, #ff4c2b 0%, #ff7043 100%);
 }
 
-.btn-action-primary:active {
-  transform: translateY(0) scale(0.97);
+.btn-hero-play:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(252, 63, 29, 0.4);
 }
 
-.btn-action-round {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 20px;
+.btn-hero-play:focus,
+.btn-hero-play:focus-visible {
+  outline: none;
+}
+
+/* Circular Icon Action Buttons (Like, Dislike, Wave By Track, Lyrics, etc.) */
+.btn-action-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: rgba(255, 255, 255, 0.85);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
+  flex-shrink: 0;
+  outline: none;
 }
 
-.btn-action-round:hover {
-  background: rgba(255, 255, 255, 0.12);
+.btn-action-icon:hover {
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px) scale(1.06);
 }
 
-.btn-action-round:active {
-  transform: translateY(0) scale(0.97);
+.btn-action-icon:active {
+  transform: scale(0.95);
 }
 
-.btn-action-round.liked {
+.btn-action-icon:focus,
+.btn-action-icon:focus-visible {
+  outline: none;
+}
+
+.btn-action-icon.liked {
   color: #ff3b30 !important;
   border-color: rgba(255, 59, 48, 0.5) !important;
-  background: rgba(255, 59, 48, 0.16) !important;
+  background: rgba(255, 59, 48, 0.18) !important;
+  box-shadow: 0 0 14px rgba(255, 59, 48, 0.35) !important;
 }
 
-.btn-action-round.liked svg {
+.btn-action-icon.liked svg {
   fill: #ff3b30 !important;
   stroke: #ff3b30 !important;
   animation: heartPop 0.3s var(--ease-bounce);
 }
 
-.btn-action-round.btn-lyrics-pill {
-  color: #00f0ff;
-  border-color: rgba(0, 240, 255, 0.3);
-  background: rgba(0, 240, 255, 0.08);
+.btn-action-icon.btn-lyrics-icon {
+  color: rgba(0, 240, 255, 0.85);
+  border-color: rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.06);
 }
 
-.btn-action-round.btn-lyrics-pill:hover {
-  color: #ffffff;
-  border-color: #00f0ff;
+.btn-action-icon.btn-lyrics-icon:hover {
   background: rgba(0, 240, 255, 0.18);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+  border-color: rgba(0, 240, 255, 0.55);
+  color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
 }
 
 @keyframes heartPop {
