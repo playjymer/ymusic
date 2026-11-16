@@ -493,7 +493,7 @@ function updateStationDisplay() {
     titlebarStationName.textContent = label;
   }
   if (heroStationLabel) {
-    heroStationLabel.textContent = `ИСТОЧНИК: ${label}`;
+    heroStationLabel.textContent = label;
   }
 }
 
@@ -598,7 +598,7 @@ function setTrackPreview(track, direction = 'next') {
     }
   });
 
-  trackAlbumMain.textContent = track.album ? `АЛЬБОМ: ${track.album.toUpperCase()}` : '';
+  trackAlbumMain.textContent = track.album ? `Альбом: ${track.album}` : '';
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
   // Sync Universal Bottom Dock
@@ -702,7 +702,6 @@ function updateFullscreenLyricsMeta() {
   const fsCover = document.getElementById('fs-lyrics-cover');
   const fsTitle = document.getElementById('fs-lyrics-title');
   const fsArtist = document.getElementById('fs-lyrics-artist');
-  const fsPill = document.getElementById('fs-lyrics-pill');
   const fsPlayIcon = document.getElementById('fs-play-icon');
   const fsTot = document.getElementById('fs-time-total');
   const act = getActiveAudio();
@@ -713,23 +712,10 @@ function updateFullscreenLyricsMeta() {
   if (fsTitle) fsTitle.textContent = currentTrack.title || 'Без названия';
   if (fsArtist) fsArtist.textContent = currentTrack.artists?.join(', ') || '';
 
-  if (fsPill) {
-    if (currentLyrics?.synced) {
-      fsPill.textContent = '✨ СИНХРОНИЗИРОВАНО';
-      fsPill.className = 'fs-lyrics-pill';
-    } else if (currentLyrics?.lines?.length) {
-      fsPill.textContent = 'ТЕКСТ ПЕСНИ';
-      fsPill.className = 'fs-lyrics-pill plain';
-    } else {
-      fsPill.textContent = 'НЕТ ТЕКСТА';
-      fsPill.className = 'fs-lyrics-pill plain';
-    }
-  }
-
   if (fsPlayIcon) {
     fsPlayIcon.innerHTML = isPlaying
-      ? '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
-      : '<polygon points="6 4 20 12 6 20 6 4"></polygon>';
+      ? '<rect x="6" y="4" width="3.5" height="16" rx="1.5"></rect><rect x="14.5" y="4" width="3.5" height="16" rx="1.5"></rect>'
+      : '<polygon points="8 5 19 12 8 19"></polygon>';
   }
 
   if (fsTot && act && !isNaN(act.duration) && act.duration > 0) {
@@ -2082,6 +2068,7 @@ function setupAudioEvents() {
         if (currentTrack) updateMediaSession(currentTrack);
         const coverWrap = document.getElementById('cover-wrapper');
         if (coverWrap) coverWrap.classList.add('is-playing');
+        if (typeof triggerVisualizerLoop === 'function') triggerVisualizerLoop();
       }
     });
 
@@ -2093,6 +2080,7 @@ function setupAudioEvents() {
         if (currentTrack) updateMediaSession(currentTrack);
         const coverWrap = document.getElementById('cover-wrapper');
         if (coverWrap) coverWrap.classList.add('is-playing');
+        if (typeof triggerVisualizerLoop === 'function') triggerVisualizerLoop();
       }
     });
 
@@ -3319,6 +3307,7 @@ function setupSpectrumVisualizer() {
   updateCanvasDimensions();
 
   let lastFrameTime = 0;
+  let idleFrames = 0;
   const FRAME_INTERVAL = 1000 / 30; // 30 FPS cap saves ~75% GPU and CPU!
 
   function renderVisualizer(now) {
@@ -3326,6 +3315,22 @@ function setupSpectrumVisualizer() {
       visAnimFrameId = null;
       return; // ZERO GPU RENDERING WHEN NOT FOCUSED OR MINIMIZED!
     }
+
+    const isAudioActive = isPlaying && !audio.paused;
+    if (!isAudioActive) {
+      idleFrames++;
+      if (idleFrames > 25) {
+        // Sleep completely when audio is paused/stopped
+        const w = spectrumCanvas.width || cachedCanvasW;
+        const h = spectrumCanvas.height || cachedCanvasH;
+        specCtx.clearRect(0, 0, w, h);
+        visAnimFrameId = null;
+        return; // ZERO GPU USAGE WHEN PAUSED!
+      }
+    } else {
+      idleFrames = 0;
+    }
+
     visAnimFrameId = requestAnimationFrame(renderVisualizer);
 
     if (now && now - lastFrameTime < FRAME_INTERVAL) {
@@ -3505,24 +3510,35 @@ function setupSpectrumVisualizer() {
     specCtx.lineTo(w, h);
     specCtx.closePath();
 
-    const fillGrad = specCtx.createLinearGradient(0, baseline - maxAmp, 0, h);
-    fillGrad.addColorStop(0, `rgba(252, 63, 29, ${active ? 0.30 : 0.06})`);
-    fillGrad.addColorStop(0.5, `rgba(255, 159, 28, ${active ? 0.12 : 0.02})`);
-    fillGrad.addColorStop(1, 'rgba(7, 8, 14, 0)');
-    specCtx.fillStyle = fillGrad;
+    // Cache canvas linear gradients across frames
+    if (!renderLivingAuroraWave._cachedW || renderLivingAuroraWave._cachedW !== w || renderLivingAuroraWave._cachedH !== h) {
+      renderLivingAuroraWave._cachedW = w;
+      renderLivingAuroraWave._cachedH = h;
+      renderLivingAuroraWave._fillGradActive = specCtx.createLinearGradient(0, baseline - maxAmp, 0, h);
+      renderLivingAuroraWave._fillGradActive.addColorStop(0, 'rgba(252, 63, 29, 0.30)');
+      renderLivingAuroraWave._fillGradActive.addColorStop(0.5, 'rgba(255, 159, 28, 0.12)');
+      renderLivingAuroraWave._fillGradActive.addColorStop(1, 'rgba(7, 8, 14, 0)');
+
+      renderLivingAuroraWave._fillGradIdle = specCtx.createLinearGradient(0, baseline - maxAmp, 0, h);
+      renderLivingAuroraWave._fillGradIdle.addColorStop(0, 'rgba(252, 63, 29, 0.06)');
+      renderLivingAuroraWave._fillGradIdle.addColorStop(0.5, 'rgba(255, 159, 28, 0.02)');
+      renderLivingAuroraWave._fillGradIdle.addColorStop(1, 'rgba(7, 8, 14, 0)');
+
+      renderLivingAuroraWave._lineGrad = specCtx.createLinearGradient(0, 0, w, 0);
+      renderLivingAuroraWave._lineGrad.addColorStop(0, '#fc3f1d');
+      renderLivingAuroraWave._lineGrad.addColorStop(0.35, '#ff9f1c');
+      renderLivingAuroraWave._lineGrad.addColorStop(0.72, '#ff2d55');
+      renderLivingAuroraWave._lineGrad.addColorStop(1, '#00f0ff');
+    }
+
+    specCtx.fillStyle = active ? renderLivingAuroraWave._fillGradActive : renderLivingAuroraWave._fillGradIdle;
     specCtx.fill();
 
     // Layer 3: Radiant Primary Aurora Crest Ribbon
     specCtx.beginPath();
     drawBezierWave(primaryPoints);
 
-    const lineGrad = specCtx.createLinearGradient(0, 0, w, 0);
-    lineGrad.addColorStop(0, '#fc3f1d');
-    lineGrad.addColorStop(0.35, '#ff9f1c');
-    lineGrad.addColorStop(0.72, '#ff2d55');
-    lineGrad.addColorStop(1, '#00f0ff');
-
-    specCtx.strokeStyle = lineGrad;
+    specCtx.strokeStyle = renderLivingAuroraWave._lineGrad;
     specCtx.lineWidth = 3 + bass * 2;
     specCtx.stroke();
   }
