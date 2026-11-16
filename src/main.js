@@ -3342,8 +3342,6 @@ function setupSpectrumVisualizer() {
     const h = spectrumCanvas.height || cachedCanvasH;
     specCtx.clearRect(0, 0, w, h);
 
-    const isAudioActive = isPlaying && !audio.paused;
-
     // Read REAL audio data from Web Audio API Analyser Node
     let hasRealAudio = false;
     let realBass = 0;
