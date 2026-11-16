@@ -666,6 +666,30 @@ let currentActiveLyricIdx = -1;
 let lyricsLoadingTrackId = null;
 let isFsLyricsOpen = false;
 let fsUserManualScrollUntil = 0;
+let fsLyricsAnimId = null;
+
+function startFsLyricsLoop() {
+  if (fsLyricsAnimId) return;
+  function tick() {
+    if (!isFsLyricsOpen) {
+      fsLyricsAnimId = null;
+      return;
+    }
+    const act = getActiveAudio();
+    if (act && isPlaying && !act.paused) {
+      updateLyricsHighlight(act.currentTime);
+    }
+    fsLyricsAnimId = requestAnimationFrame(tick);
+  }
+  fsLyricsAnimId = requestAnimationFrame(tick);
+}
+
+function stopFsLyricsLoop() {
+  if (fsLyricsAnimId) {
+    cancelAnimationFrame(fsLyricsAnimId);
+    fsLyricsAnimId = null;
+  }
+}
 
 function openFullscreenLyrics() {
   const overlay = document.getElementById('fullscreen-lyrics-overlay');
@@ -678,6 +702,7 @@ function openFullscreenLyrics() {
   updateFullscreenLyricsMeta();
   const act = getActiveAudio();
   if (act) updateLyricsHighlight(act.currentTime);
+  startFsLyricsLoop();
 }
 
 function closeFullscreenLyrics() {
@@ -687,6 +712,7 @@ function closeFullscreenLyrics() {
   isFsLyricsOpen = false;
   overlay.style.display = 'none';
   if (btnDock) btnDock.classList.remove('active');
+  stopFsLyricsLoop();
 }
 
 function toggleFullscreenLyrics() {
@@ -851,13 +877,38 @@ function updateLyricsHighlight(curTime) {
     const fsScroller = document.getElementById('fs-lyrics-scroller');
     const fsLines = fsScroller?.querySelectorAll('.fs-lyric-line');
 
-    if (fsLines && fsLines.length > 0 && activeIdx >= 0) {
+    if (fsLines && fsLines.length > 0) {
+      // Calculate smooth character sweep progress for active singing line
+      let linePct = '0%';
+      if (activeIdx >= 0 && activeIdx < lines.length) {
+        const curLine = lines[activeIdx];
+        const nextLine = lines[activeIdx + 1];
+        const lineStart = curLine.time;
+        // Natural line duration: characters * 0.18s, bounded between 1.8s and interval to next line
+        const naturalDur = Math.max(1.8, (curLine.text || '').length * 0.18);
+        const interval = nextLine ? Math.max(0.6, nextLine.time - lineStart) : naturalDur;
+        const effectiveDur = Math.max(0.6, Math.min(interval, Math.max(1.8, naturalDur)));
+        const p = Math.min(1, Math.max(0, (curTime - lineStart) / effectiveDur));
+        linePct = (p * 100).toFixed(1) + '%';
+      }
+
       fsLines.forEach((el, i) => {
-        el.classList.toggle('active', i === activeIdx);
-        el.classList.toggle('past', i < activeIdx);
+        if (i === activeIdx) {
+          el.classList.add('active');
+          el.classList.remove('past');
+          el.style.setProperty('--line-pct', linePct);
+        } else if (i < activeIdx) {
+          el.classList.remove('active');
+          el.classList.add('past');
+          el.style.setProperty('--line-pct', '100%');
+        } else {
+          el.classList.remove('active');
+          el.classList.remove('past');
+          el.style.setProperty('--line-pct', '0%');
+        }
       });
 
-      if (Date.now() > fsUserManualScrollUntil && fsStage && fsScroller) {
+      if (Date.now() > fsUserManualScrollUntil && fsStage && fsScroller && activeIdx >= 0) {
         const activeEl = fsLines[activeIdx];
         if (activeEl) {
           const targetTop = activeEl.offsetTop - (fsStage.clientHeight / 2) + (activeEl.clientHeight / 2);
@@ -2074,6 +2125,7 @@ function setupAudioEvents() {
         const coverWrap = document.getElementById('cover-wrapper');
         if (coverWrap) coverWrap.classList.add('is-playing');
         if (typeof triggerVisualizerLoop === 'function') triggerVisualizerLoop();
+        if (isFsLyricsOpen && typeof startFsLyricsLoop === 'function') startFsLyricsLoop();
       }
     });
 
@@ -2086,6 +2138,7 @@ function setupAudioEvents() {
         const coverWrap = document.getElementById('cover-wrapper');
         if (coverWrap) coverWrap.classList.add('is-playing');
         if (typeof triggerVisualizerLoop === 'function') triggerVisualizerLoop();
+        if (isFsLyricsOpen && typeof startFsLyricsLoop === 'function') startFsLyricsLoop();
       }
     });
 
@@ -2095,6 +2148,7 @@ function setupAudioEvents() {
         updatePlayState(false);
         const coverWrap = document.getElementById('cover-wrapper');
         if (coverWrap) coverWrap.classList.remove('is-playing');
+        if (typeof stopFsLyricsLoop === 'function') stopFsLyricsLoop();
       }
     });
 

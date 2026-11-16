@@ -151,28 +151,7 @@
           <div class="stage-views-area">
             <!-- VIEW: MY WAVE -->
             <div id="view-wave" class="tab-view active">
-              <!-- Organic Visualizer Stage (Fluid Aurora Soundwave & Studio RTA) -->
-              <div class="visualizer-container">
-                <div class="visualizer-header">
-                  <div class="vis-status-tag">
-                    <span class="vis-indicator-dot"></span>
-                    <span class="vis-status-text" id="vis-status-label">ЖИВОЙ АУДИОПОТОК</span>
-                  </div>
-                  <div class="vis-mode-switch">
-                    <button class="vis-toggle-btn active" id="btn-vis-wave" title="Режим: Органическая волна">
-                      <span>🌊</span><span>Волна</span>
-                    </button>
-                    <button class="vis-toggle-btn" id="btn-vis-spectrum" title="Режим: Неоновый спектр">
-                      <span>📊</span><span>Спектр</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="visualizer-canvas-wrap">
-                  <canvas id="spectrum-canvas" width="720" height="130"></canvas>
-                </div>
-              </div>
-
-              <!-- Central Track Identity Deck -->
+              <!-- Central Track Identity Deck (Focal Hero Stage) -->
               <div class="track-identity-deck">
                 <div class="cover-wrapper" id="cover-wrapper">
                   <img id="track-cover-main" src="assets/default-cover.svg" alt="Cover" class="cover-main-img" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
@@ -229,6 +208,27 @@
                         <circle cx="6" cy="18" r="3"></circle>
                         <circle cx="18" cy="16" r="3"></circle>
                       </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Organic Soundwave Waveform Stage (Borderless Ambient Visualizer) -->
+              <div class="visualizer-container">
+                <div class="visualizer-canvas-wrap">
+                  <canvas id="spectrum-canvas" width="720" height="120"></canvas>
+                </div>
+                <div class="visualizer-footer">
+                  <div class="vis-status-tag">
+                    <span class="vis-indicator-dot"></span>
+                    <span class="vis-status-text" id="vis-status-label">АУДИОПОТОК</span>
+                  </div>
+                  <div class="vis-mode-switch">
+                    <button class="vis-toggle-btn active" id="btn-vis-wave" title="Режим: Волна">
+                      <span>🌊 Волна</span>
+                    </button>
+                    <button class="vis-toggle-btn" id="btn-vis-spectrum" title="Режим: Спектр">
+                      <span>📊 Спектр</span>
                     </button>
                   </div>
                 </div>
