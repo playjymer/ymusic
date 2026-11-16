@@ -527,19 +527,28 @@ html, body {
 }
 
 .tab-view {
-  display: none;
+  display: none !important;
   flex: 1;
   min-height: 0;
   flex-direction: column;
 }
 
-#view-wave {
-  display: flex;
+.tab-view.active {
+  display: flex !important;
+}
+
+#view-wave.active {
+  display: flex !important;
   flex-direction: column;
   justify-content: flex-start;
   height: 100%;
   gap: 20px;
   padding: 8px 6px;
+}
+
+/* Hide duplicate bottom-left cover and title when on the main hero stage view */
+body.in-main-view #dock-now-playing {
+  display: none !important;
 }
 
 /* Organic Visualizer Screen & Controls - Borderless Fluid Stage */

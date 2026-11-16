@@ -471,16 +471,31 @@ function setupSidebarNavigation() {
 
 function switchTab(tab) {
   document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+
+  // Toggle in-main-view body class so bottom dock track info is ONLY visible outside the main menu
+  const isMain = (tab === 'wave');
+  document.body.classList.toggle('in-main-view', isMain);
+
   if (tab === 'wave') {
+    currentSourceMode = 'wave';
     viewWave.classList.add('active');
+    updateStationDisplay();
   } else if (tab === 'search') {
+    currentSourceMode = 'search';
     viewSearch.classList.add('active');
-    if (searchInput) searchInput.focus();
+    updateStationDisplay();
+    if (searchInput) {
+      setTimeout(() => searchInput.focus(), 60);
+    }
   } else if (tab === 'favorites') {
+    currentSourceMode = 'favorites';
     viewFavorites.classList.add('active');
+    updateStationDisplay();
     loadFavorites();
   } else if (tab === 'artist') {
+    currentSourceMode = 'artist';
     if (viewArtist) viewArtist.classList.add('active');
+    updateStationDisplay();
   }
 }
 
