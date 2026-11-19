@@ -630,6 +630,10 @@ function setTrackPreview(track, direction = 'next') {
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
   // Sync Universal Bottom Dock
+  const dockThumbBack = document.getElementById('dock-thumb-back');
+  if (dockThumbBack && dockThumb && dockThumb.src && dockThumb.src !== cover) {
+    dockThumbBack.src = dockThumb.src;
+  }
   if (dockThumb) dockThumb.src = cover;
   if (dockTitle) dockTitle.textContent = track.title;
   if (dockArtist) {

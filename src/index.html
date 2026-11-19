@@ -333,7 +333,10 @@
             <div class="dock-layout">
               <!-- Left: Now Playing Mini Deck -->
               <div class="dock-now-playing" id="dock-now-playing">
-                <img id="dock-thumb" src="assets/default-cover.svg" class="dock-thumb-img" alt="Cover" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+                <div class="dock-thumb-wrapper">
+                  <img id="dock-thumb-back" src="assets/default-cover.svg" class="dock-thumb-img dock-thumb-back" alt="" />
+                  <img id="dock-thumb" src="assets/default-cover.svg" class="dock-thumb-img dock-thumb-front" alt="Cover" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='assets/default-cover.svg'" />
+                </div>
                 <div class="dock-meta">
                   <div id="dock-title" class="dock-title-text">Запустите трек</div>
                   <div id="dock-artist" class="dock-artist-text">Яндекс Музыка</div>
