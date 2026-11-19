@@ -3447,7 +3447,10 @@ function extractDominantColor(imgSrc) {
   });
 }
 
+let currentActivePalette = null;
+
 function applyMaterialPalette(palette, label) {
+  currentActivePalette = palette;
   const root = document.documentElement;
   root.style.setProperty('--md-sys-color-primary', palette.primary);
   root.style.setProperty('--md-sys-color-on-primary', palette.onPrimary);
@@ -3901,41 +3904,18 @@ function setupSpectrumVisualizer() {
     }
   }
 
-  // 1. LIVING ORGANIC SOUNDWAVE (Fluid Bezier ribbon sharply reactive to beat)
+  // 1. LIVING ORGANIC SOUNDWAVE (Material 3 Fluid Harmonic Ribbon)
   function renderLivingAuroraWave(w, h, active, hasReal, bass, mids, highs, freqs, isBeat, beatDelta) {
-    const baseline = h * 0.64;
-    const maxAmp = active ? h * 0.44 : h * 0.08;
-    const topMargin = 14;
-    const bottomMargin = 12;
-    const maxSafeSwell = baseline - topMargin;
-    const minSafeSwell = -(h - baseline - bottomMargin);
+    const baseline = h - 6; // Grounded seamlessly at bottom floor of stage
+    const maxAmp = active ? (h - 22) : (h * 0.12);
 
-    // Ambient floating particles responding softly to bass
-    for (let i = 0; i < particles.length; i++) {
-      const pt = particles[i];
-      pt.y -= pt.speedY * (active ? (1 + bass * 2.2 + (isBeat ? 1.2 : 0)) : 0.4);
-      pt.x += pt.driftX;
-      if (pt.y < 0.04) {
-        pt.y = 0.96;
-        pt.x = Math.random();
-      }
-      if (pt.x < 0) pt.x = 1;
-      if (pt.x > 1) pt.x = 0;
+    const primaryColor = (currentActivePalette && currentActivePalette.primary) || '#ff897d';
+    const tertiaryColor = (currentActivePalette && currentActivePalette.tertiary) || '#a8d5e2';
 
-      const px = pt.x * w;
-      const py = Math.max(topMargin, Math.min(h - bottomMargin, pt.y * h));
-      const alpha = pt.opacity * (active ? (0.25 + bass * 0.55) : 0.12) * (0.8 + 0.2 * Math.sin(time * 2 + pt.pulsePhase));
-
-      specCtx.beginPath();
-      specCtx.arc(px, py, pt.radius * (1 + bass * 0.7 + (isBeat ? 0.8 : 0)), 0, Math.PI * 2);
-      specCtx.fillStyle = `rgba(255, 159, 28, ${alpha})`;
-      specCtx.fill();
-    }
-
-    // Update organic wave nodes from real frequency bands
+    // Update organic wave nodes from frequency bands
     for (let i = 0; i < waveNodes; i++) {
       const normIdx = i / (waveNodes - 1); // 0.0 to 1.0
-      // Window envelope (Hann curve: 0 at edges, 1 in center)
+      // Hann envelope: mathematically 0 at exact endpoints (x=0, x=w)
       const windowEnv = Math.sin(normIdx * Math.PI);
 
       let targetPrimary = 0;
@@ -3951,29 +3931,29 @@ function setupSpectrumVisualizer() {
         }
         const bandMag = (bandSum / (binEnd - binStart + 1)) / 255.0;
 
-        // Harmonic fluid ripple
-        const primaryPhase = time * 2.2 + normIdx * 5.0;
-        const ripple = Math.sin(primaryPhase) * 0.15 * (mids + highs * 0.7);
+        // Fluid organic ripple
+        const primaryPhase = time * 2.2 + normIdx * 5.2;
+        const ripple = Math.sin(primaryPhase) * 0.12 * (mids + highs * 0.6);
 
-        // Punchy beat kick thrust
-        const kickThrust = isBeat ? Math.min(0.65, beatDelta * 1.6 + bass * 0.3) : 0;
-        const rawSwell = (bandMag * 0.65 + bass * 0.30 + kickThrust + ripple) * windowEnv * maxAmp;
-        targetPrimary = Math.max(minSafeSwell, Math.min(maxSafeSwell, rawSwell));
+        // Beat kick response
+        const kickThrust = isBeat ? Math.min(0.5, beatDelta * 1.5 + bass * 0.25) : 0;
+        const rawSwell = (bandMag * 0.65 + bass * 0.28 + kickThrust + ripple) * windowEnv * maxAmp;
+        targetPrimary = Math.max(0, Math.min(maxAmp, rawSwell));
 
-        // Subtle secondary atmospheric layer with gentle phase offset
-        const backPhase = time * 1.8 + normIdx * 4.2 + 0.6;
-        const backRipple = Math.cos(backPhase) * 0.14 * mids;
-        const rawBack = (bandMag * 0.45 + bass * 0.18 + (isBeat ? kickThrust * 0.5 : 0) + backRipple) * windowEnv * (maxAmp * 0.72);
-        targetBack = Math.max(minSafeSwell, Math.min(maxSafeSwell, rawBack));
+        // Secondary harmonic backing wave with gentle phase shift
+        const backPhase = time * 1.7 + normIdx * 4.4 + 0.8;
+        const backRipple = Math.cos(backPhase) * 0.12 * mids;
+        const rawBack = (bandMag * 0.45 + bass * 0.18 + backRipple) * windowEnv * (maxAmp * 0.68);
+        targetBack = Math.max(0, Math.min(maxAmp, rawBack));
       } else if (active) {
-        // Resting gentle harmonic breath when paused or starting
-        targetPrimary = Math.sin(time * 1.5 + normIdx * 4.2) * maxAmp * 0.20 * windowEnv;
-        targetBack = Math.cos(time * 1.2 + normIdx * 3.8) * maxAmp * 0.15 * windowEnv;
+        // Gentle resting breath when idle or starting
+        targetPrimary = (Math.sin(time * 1.4 + normIdx * 4.2) * 0.5 + 0.5) * (maxAmp * 0.18) * windowEnv;
+        targetBack = (Math.cos(time * 1.1 + normIdx * 3.6) * 0.5 + 0.5) * (maxAmp * 0.14) * windowEnv;
       }
 
-      // Snappy attack on beat (0.88) + brisk decay (0.24) so it punches clearly to the beat
-      const smoothFactorAttack = isBeat ? 0.88 : 0.75;
-      const smoothFactorDecay = 0.24;
+      // Physics smoothing
+      const smoothFactorAttack = isBeat ? 0.82 : 0.65;
+      const smoothFactorDecay = 0.20;
 
       const fPrim = targetPrimary > waveHeights[i] ? smoothFactorAttack : smoothFactorDecay;
       waveHeights[i] += (targetPrimary - waveHeights[i]) * fPrim;
@@ -3982,18 +3962,17 @@ function setupSpectrumVisualizer() {
       waveHeightsBack[i] += (targetBack - waveHeightsBack[i]) * fBack;
     }
 
-    // Convert nodes to 2D coordinates with strict bounds safety
+    // Convert nodes to 2D coordinates: y is baseline - waveHeight (rising UP from baseline)
     const primaryPoints = [];
     const backPoints = [];
     for (let i = 0; i < waveNodes; i++) {
       const x = (i / (waveNodes - 1)) * w;
-      const primY = Math.max(topMargin, Math.min(h - bottomMargin, baseline - waveHeights[i]));
-      const backY = Math.max(topMargin, Math.min(h - bottomMargin, baseline - waveHeightsBack[i]));
+      const primY = Math.max(8, baseline - waveHeights[i]);
+      const backY = Math.max(8, baseline - waveHeightsBack[i]);
       primaryPoints.push({ x, y: primY });
       backPoints.push({ x, y: backY });
     }
 
-    // Helper: draw smooth Bezier curve through points
     function drawBezierWave(points) {
       if (points.length < 2) return;
       specCtx.moveTo(points[0].x, points[0].y);
@@ -4005,51 +3984,43 @@ function setupSpectrumVisualizer() {
       specCtx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
     }
 
-    // Layer 1: Backing Cyan Atmosphere Wave
+    // Layer 1: Secondary Harmonic Aura Ribbon (Tertiary Theme Color)
     specCtx.beginPath();
     drawBezierWave(backPoints);
-    specCtx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
-    specCtx.lineWidth = 2.5;
+    specCtx.strokeStyle = tertiaryColor;
+    specCtx.globalAlpha = active ? 0.38 : 0.18;
+    specCtx.lineWidth = 2.0;
     specCtx.stroke();
+    specCtx.globalAlpha = 1.0;
 
-    // Layer 2: Glowing Fill Under Primary Ribbon
+    // Layer 2: Soft Glowing Fill Under Primary Wave (Tapered to baseline)
     specCtx.beginPath();
-    specCtx.moveTo(0, h);
-    specCtx.lineTo(0, primaryPoints[0].y);
+    specCtx.moveTo(0, baseline);
     drawBezierWave(primaryPoints);
-    specCtx.lineTo(w, h);
+    specCtx.lineTo(w, baseline);
     specCtx.closePath();
 
-    // Cache canvas linear gradients across frames
-    if (!renderLivingAuroraWave._cachedW || renderLivingAuroraWave._cachedW !== w || renderLivingAuroraWave._cachedH !== h) {
-      renderLivingAuroraWave._cachedW = w;
-      renderLivingAuroraWave._cachedH = h;
-      renderLivingAuroraWave._fillGradActive = specCtx.createLinearGradient(0, baseline - maxAmp, 0, h);
-      renderLivingAuroraWave._fillGradActive.addColorStop(0, 'rgba(252, 63, 29, 0.30)');
-      renderLivingAuroraWave._fillGradActive.addColorStop(0.5, 'rgba(255, 159, 28, 0.12)');
-      renderLivingAuroraWave._fillGradActive.addColorStop(1, 'rgba(7, 8, 14, 0)');
-
-      renderLivingAuroraWave._fillGradIdle = specCtx.createLinearGradient(0, baseline - maxAmp, 0, h);
-      renderLivingAuroraWave._fillGradIdle.addColorStop(0, 'rgba(252, 63, 29, 0.06)');
-      renderLivingAuroraWave._fillGradIdle.addColorStop(0.5, 'rgba(255, 159, 28, 0.02)');
-      renderLivingAuroraWave._fillGradIdle.addColorStop(1, 'rgba(7, 8, 14, 0)');
-
-      renderLivingAuroraWave._lineGrad = specCtx.createLinearGradient(0, 0, w, 0);
-      renderLivingAuroraWave._lineGrad.addColorStop(0, '#fc3f1d');
-      renderLivingAuroraWave._lineGrad.addColorStop(0.35, '#ff9f1c');
-      renderLivingAuroraWave._lineGrad.addColorStop(0.72, '#ff2d55');
-      renderLivingAuroraWave._lineGrad.addColorStop(1, '#00f0ff');
-    }
-
-    specCtx.fillStyle = active ? renderLivingAuroraWave._fillGradActive : renderLivingAuroraWave._fillGradIdle;
+    const fillGrad = specCtx.createLinearGradient(0, baseline - maxAmp, 0, baseline);
+    fillGrad.addColorStop(0, primaryColor + (active ? '40' : '15'));
+    fillGrad.addColorStop(0.65, tertiaryColor + (active ? '1a' : '08'));
+    fillGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    specCtx.fillStyle = fillGrad;
     specCtx.fill();
 
-    // Layer 3: Radiant Primary Aurora Crest Ribbon
+    // Layer 3: Vibrant Primary Wave Ribbon (Linear gradient along width)
     specCtx.beginPath();
     drawBezierWave(primaryPoints);
 
-    specCtx.strokeStyle = renderLivingAuroraWave._lineGrad;
-    specCtx.lineWidth = 3 + bass * 2;
+    const strokeGrad = specCtx.createLinearGradient(0, 0, w, 0);
+    strokeGrad.addColorStop(0, primaryColor);
+    strokeGrad.addColorStop(0.45, tertiaryColor);
+    strokeGrad.addColorStop(0.8, primaryColor);
+    strokeGrad.addColorStop(1, tertiaryColor);
+
+    specCtx.strokeStyle = strokeGrad;
+    specCtx.lineWidth = Math.min(5, 2.5 + bass * 2.2);
+    specCtx.lineCap = 'round';
+    specCtx.lineJoin = 'round';
     specCtx.stroke();
   }
 
