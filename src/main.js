@@ -201,6 +201,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupTransportShuffle();
   setupEqualizerUI();
   setupSettingsModal();
+  setupThemeController();
   setupFullscreenLyrics();
 
   window.addEventListener('click', () => ensureAudioContext(), { once: true });
@@ -592,6 +593,10 @@ function setTrackPreview(track, direction = 'next') {
   const cover = track.cover_url || 'assets/default-cover.svg';
   trackCoverMain.src = cover;
   trackTitleMain.textContent = track.title;
+  
+  if (typeof onTrackChangedForTheme === 'function') {
+    onTrackChangedForTheme(cover, track.title);
+  }
   
   // Interactive Clickable Artist Links
   trackArtistMain.innerHTML = '';
@@ -3190,6 +3195,362 @@ function syncSettingsUser() {
     if (userName) userName.textContent = currentUser.display_name || currentUser.login;
     if (avatarImg && currentUser.avatar_url) avatarImg.src = currentUser.avatar_url;
   }
+}
+
+// ==========================================================================
+// MATERIAL YOU (MONET) DYNAMIC THEME ENGINE & PRESETS CONTROLLER
+// ==========================================================================
+let currentThemeMode = 'preset:terracotta'; // 'album', 'system', 'wallpaper', 'preset:<name>'
+let systemAccentColorCached = null;
+let wallpaperBase64Cached = null;
+
+const THEME_PRESETS = {
+  terracotta: {
+    name: 'Персик (Pixel)',
+    primary: '#ff897d',
+    onPrimary: '#5c1407',
+    primaryContainer: '#772b1d',
+    onPrimaryContainer: '#ffdad4',
+    secondaryContainer: '#473a36',
+    onSecondaryContainer: '#ffdbd3',
+    tertiary: '#a8d5e2',
+    tertiaryContainer: '#234853',
+    onTertiaryContainer: '#c4ecf9',
+    surface: '#131316',
+    surfaceContainerLow: '#1a1a1e',
+    surfaceContainer: '#202025',
+    surfaceContainerHigh: '#2a2a30',
+    surfaceContainerHighest: '#35353c'
+  },
+  sage: {
+    name: 'Шалфей (Мята)',
+    primary: '#8ed5a2',
+    onPrimary: '#003919',
+    primaryContainer: '#1b4e2f',
+    onPrimaryContainer: '#baf5cd',
+    secondaryContainer: '#35433a',
+    onSecondaryContainer: '#d4e7db',
+    tertiary: '#a1d5cb',
+    tertiaryContainer: '#1f4e47',
+    onTertiaryContainer: '#bcece2',
+    surface: '#121513',
+    surfaceContainerLow: '#181c19',
+    surfaceContainer: '#1e231f',
+    surfaceContainerHigh: '#282f2a',
+    surfaceContainerHighest: '#333a35'
+  },
+  sky: {
+    name: 'Лазурь (Океан)',
+    primary: '#99cbff',
+    onPrimary: '#003355',
+    primaryContainer: '#164676',
+    onPrimaryContainer: '#d2e4ff',
+    secondaryContainer: '#35404f',
+    onSecondaryContainer: '#d6e3f7',
+    tertiary: '#82d8d8',
+    tertiaryContainer: '#004f50',
+    onTertiaryContainer: '#9ef5f5',
+    surface: '#111418',
+    surfaceContainerLow: '#171b21',
+    surfaceContainer: '#1d222a',
+    surfaceContainerHigh: '#282e38',
+    surfaceContainerHighest: '#333b47'
+  },
+  lavender: {
+    name: 'Лаванда (Ягода)',
+    primary: '#d5bbfb',
+    onPrimary: '#3b255b',
+    primaryContainer: '#4c3375',
+    onPrimaryContainer: '#eedcff',
+    secondaryContainer: '#453c4d',
+    onSecondaryContainer: '#e9dfef',
+    tertiary: '#f1b7ca',
+    tertiaryContainer: '#5c2d3d',
+    onTertiaryContainer: '#ffd9e4',
+    surface: '#151218',
+    surfaceContainerLow: '#1c1820',
+    surfaceContainer: '#231e28',
+    surfaceContainerHigh: '#2e2835',
+    surfaceContainerHighest: '#393342'
+  },
+  amber: {
+    name: 'Янтарь (Золото)',
+    primary: '#eac248',
+    onPrimary: '#3e2e00',
+    primaryContainer: '#584400',
+    onPrimaryContainer: '#ffe082',
+    secondaryContainer: '#484132',
+    onSecondaryContainer: '#f0e3ce',
+    tertiary: '#a3d39c',
+    tertiaryContainer: '#264e22',
+    onTertiaryContainer: '#bfeebd',
+    surface: '#161411',
+    surfaceContainerLow: '#1d1b16',
+    surfaceContainer: '#24211b',
+    surfaceContainerHigh: '#302c24',
+    surfaceContainerHighest: '#3c372e'
+  },
+  rose: {
+    name: 'Коралл (Роза)',
+    primary: '#ff839a',
+    onPrimary: '#5e0b23',
+    primaryContainer: '#721f37',
+    onPrimaryContainer: '#ffd9df',
+    secondaryContainer: '#4d373d',
+    onSecondaryContainer: '#f8dbe1',
+    tertiary: '#8cd5d5',
+    tertiaryContainer: '#044e4e',
+    onTertiaryContainer: '#a8f2f2',
+    surface: '#161214',
+    surfaceContainerLow: '#1e1719',
+    surfaceContainer: '#251d20',
+    surfaceContainerHigh: '#31272b',
+    surfaceContainerHighest: '#3d3237'
+  },
+  monochrome: {
+    name: 'Монохром (OLED)',
+    primary: '#c7c6ca',
+    onPrimary: '#2f3033',
+    primaryContainer: '#46464a',
+    onPrimaryContainer: '#e4e2e6',
+    secondaryContainer: '#3b3b3e',
+    onSecondaryContainer: '#e2e2e5',
+    tertiary: '#9a9a9f',
+    tertiaryContainer: '#353538',
+    onTertiaryContainer: '#d5d5d9',
+    surface: '#111113',
+    surfaceContainerLow: '#171719',
+    surfaceContainer: '#1d1d20',
+    surfaceContainerHigh: '#27272b',
+    surfaceContainerHighest: '#333337'
+  }
+};
+
+function hexToRgb(hex) {
+  let c = (hex || '#ff897d').replace('#', '');
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  const num = parseInt(c, 16);
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+function rgbToHex(r, g, b) {
+  const clamp = v => Math.max(0, Math.min(255, Math.round(v)));
+  return '#' + [clamp(r), clamp(g), clamp(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h *= 60;
+  }
+  return { h, s, l };
+}
+
+function hslToHex(h, s, l) {
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(1, s));
+  l = Math.max(0, Math.min(1, l));
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+  else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+  else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+  else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+  else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
+}
+
+function generateMonetPalette(baseHex) {
+  const { r, g, b } = hexToRgb(baseHex);
+  const { h, s } = rgbToHsl(r, g, b);
+  const sat = Math.max(0.40, Math.min(0.85, s || 0.7));
+
+  return {
+    primary: hslToHex(h, sat, 0.74),
+    onPrimary: hslToHex(h, 0.70, 0.16),
+    primaryContainer: hslToHex(h, 0.55, 0.28),
+    onPrimaryContainer: hslToHex(h, 0.65, 0.90),
+    secondaryContainer: hslToHex(h, 0.22, 0.24),
+    onSecondaryContainer: hslToHex(h, 0.30, 0.90),
+    tertiary: hslToHex((h + 60) % 360, 0.50, 0.75),
+    tertiaryContainer: hslToHex((h + 60) % 360, 0.40, 0.25),
+    onTertiaryContainer: hslToHex((h + 60) % 360, 0.55, 0.90),
+    surface: hslToHex(h, 0.08, 0.08),
+    surfaceContainerLow: hslToHex(h, 0.08, 0.11),
+    surfaceContainer: hslToHex(h, 0.08, 0.14),
+    surfaceContainerHigh: hslToHex(h, 0.08, 0.17),
+    surfaceContainerHighest: hslToHex(h, 0.08, 0.21)
+  };
+}
+
+function extractDominantColor(imgSrc) {
+  return new Promise((resolve) => {
+    if (!imgSrc || imgSrc === 'assets/default-cover.svg') {
+      return resolve('#ff897d');
+    }
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 32, 32);
+        const data = ctx.getImageData(0, 0, 32, 32).data;
+        let maxSat = -1;
+        let bestColor = null;
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+          if (a < 128) continue;
+          const max = Math.max(r, g, b) / 255;
+          const min = Math.min(r, g, b) / 255;
+          const delta = max - min;
+          const lightness = (max + min) / 2;
+          if (lightness > 0.08 && lightness < 0.92) {
+            const sat = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+            if (sat > maxSat) {
+              maxSat = sat;
+              bestColor = rgbToHex(r, g, b);
+            }
+          }
+          rSum += r; gSum += g; bSum += b; count++;
+        }
+
+        if (bestColor && maxSat > 0.15) {
+          resolve(bestColor);
+        } else if (count > 0) {
+          resolve(rgbToHex(rSum / count, gSum / count, bSum / count));
+        } else {
+          resolve('#ff897d');
+        }
+      } catch (err) {
+        resolve('#ff897d');
+      }
+    };
+    img.onerror = () => resolve('#ff897d');
+    img.src = imgSrc;
+  });
+}
+
+function applyMaterialPalette(palette, label) {
+  const root = document.documentElement;
+  root.style.setProperty('--md-sys-color-primary', palette.primary);
+  root.style.setProperty('--md-sys-color-on-primary', palette.onPrimary);
+  root.style.setProperty('--md-sys-color-primary-container', palette.primaryContainer);
+  root.style.setProperty('--md-sys-color-on-primary-container', palette.onPrimaryContainer);
+  root.style.setProperty('--md-sys-color-secondary-container', palette.secondaryContainer);
+  root.style.setProperty('--md-sys-color-on-secondary-container', palette.onSecondaryContainer);
+  root.style.setProperty('--md-sys-color-tertiary', palette.tertiary);
+  root.style.setProperty('--md-sys-color-tertiary-container', palette.tertiaryContainer);
+  root.style.setProperty('--md-sys-color-on-tertiary-container', palette.onTertiaryContainer);
+  root.style.setProperty('--md-sys-color-background', palette.surface);
+  root.style.setProperty('--md-sys-color-surface', palette.surface);
+  root.style.setProperty('--md-sys-color-surface-container-low', palette.surfaceContainerLow);
+  root.style.setProperty('--md-sys-color-surface-container', palette.surfaceContainer);
+  root.style.setProperty('--md-sys-color-surface-container-high', palette.surfaceContainerHigh);
+  root.style.setProperty('--md-sys-color-surface-container-highest', palette.surfaceContainerHighest);
+  root.style.setProperty('--accent-glow', palette.primary + '55');
+
+  const encodedColor = encodeURIComponent(palette.primary);
+  const waveSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='${encodedColor}' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`;
+  root.style.setProperty('--squiggly-wave-bg', waveSvg);
+
+  const activeNameEl = document.getElementById('active-theme-name');
+  if (activeNameEl && label) activeNameEl.textContent = label;
+}
+
+async function setThemeMode(mode) {
+  currentThemeMode = mode;
+  localStorage.setItem('ymusic_theme_choice', mode);
+
+  // Update UI active states
+  const modeBtns = document.querySelectorAll('.theme-mode-btn');
+  modeBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.themeMode === mode);
+  });
+
+  const presetCards = document.querySelectorAll('.theme-preset-card');
+  presetCards.forEach(card => {
+    card.classList.toggle('active', 'preset:' + card.dataset.preset === mode);
+  });
+
+  if (mode === 'album') {
+    const coverUrl = currentTrack?.cover_url || trackCoverMain?.src;
+    const title = currentTrack?.title || 'Играющий трек';
+    await onTrackChangedForTheme(coverUrl, title);
+  } else if (mode === 'system') {
+    try {
+      const colors = await invoke('get_system_theme_colors');
+      const accent = colors?.accent_hex || '#0078D7';
+      systemAccentColorCached = accent;
+      const palette = generateMonetPalette(accent);
+      applyMaterialPalette(palette, `Система Windows (${accent.toUpperCase()})`);
+    } catch (e) {
+      const palette = generateMonetPalette('#0078D7');
+      applyMaterialPalette(palette, 'Система Windows');
+    }
+  } else if (mode === 'wallpaper') {
+    try {
+      const colors = await invoke('get_system_theme_colors');
+      if (colors?.wallpaper_base64) {
+        wallpaperBase64Cached = colors.wallpaper_base64;
+        const color = await extractDominantColor(colors.wallpaper_base64);
+        const palette = generateMonetPalette(color);
+        applyMaterialPalette(palette, 'Обои рабочего стола');
+      } else {
+        const palette = generateMonetPalette('#ff897d');
+        applyMaterialPalette(palette, 'Обои рабочего стола');
+      }
+    } catch (e) {
+      const palette = generateMonetPalette('#ff897d');
+      applyMaterialPalette(palette, 'Обои рабочего стола');
+    }
+  } else if (mode.startsWith('preset:')) {
+    const presetId = mode.replace('preset:', '');
+    const preset = THEME_PRESETS[presetId] || THEME_PRESETS.terracotta;
+    applyMaterialPalette(preset, preset.name);
+  }
+}
+
+async function onTrackChangedForTheme(coverUrl, trackTitle) {
+  if (currentThemeMode !== 'album') return;
+  const color = await extractDominantColor(coverUrl);
+  const palette = generateMonetPalette(color);
+  applyMaterialPalette(palette, `Обложка: ${trackTitle || 'Трек'}`);
+}
+
+function setupThemeController() {
+  const modeBtns = document.querySelectorAll('.theme-mode-btn');
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setThemeMode(btn.dataset.themeMode);
+    });
+  });
+
+  const presetCards = document.querySelectorAll('.theme-preset-card');
+  presetCards.forEach(card => {
+    card.addEventListener('click', () => {
+      setThemeMode('preset:' + card.dataset.preset);
+    });
+  });
+
+  const savedChoice = localStorage.getItem('ymusic_theme_choice') || 'preset:terracotta';
+  setThemeMode(savedChoice);
 }
 
 // ==========================================================================

@@ -356,6 +356,96 @@ fn win_close(window: tauri::Window) {
     let _ = window.close();
 }
 
+#[derive(serde::Serialize)]
+pub struct SystemThemeColors {
+    pub accent_hex: Option<String>,
+    pub wallpaper_base64: Option<String>,
+}
+
+#[tauri::command]
+fn get_system_theme_colors() -> SystemThemeColors {
+    let mut accent_hex = None;
+    let mut wallpaper_base64 = None;
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        
+        // 1. Get Windows DWM Accent Color
+        if let Ok(output) = Command::new("reg")
+            .args(&["query", "HKCU\\Software\\Microsoft\\Windows\\DWM", "/v", "ColorizationColor"])
+            .output() 
+        {
+            if output.status.success() {
+                let text = String::from_utf8_lossy(&output.stdout);
+                for line in text.lines() {
+                    if line.contains("ColorizationColor") {
+                        if let Some(val_str) = line.split_whitespace().last() {
+                            let clean = val_str.trim_start_matches("0x");
+                            if let Ok(val) = u32::from_str_radix(clean, 16) {
+                                let r = (val >> 16) & 0xFF;
+                                let g = (val >> 8) & 0xFF;
+                                let b = val & 0xFF;
+                                accent_hex = Some(format!("#{:02x}{:02x}{:02x}", r, g, b));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Get Desktop Wallpaper
+        if let Ok(output) = Command::new("reg")
+            .args(&["query", "HKCU\\Control Panel\\Desktop", "/v", "WallPaper"])
+            .output()
+        {
+            if output.status.success() {
+                let text = String::from_utf8_lossy(&output.stdout);
+                for line in text.lines() {
+                    if line.contains("WallPaper") {
+                        let parts: Vec<&str> = line.split("REG_SZ").collect();
+                        if parts.len() > 1 {
+                            let path = parts[1].trim();
+                            if let Ok(bytes) = std::fs::read(path) {
+                                if bytes.len() <= 2_500_000 {
+                                    const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+                                    let mut b64 = String::with_capacity((bytes.len() + 2) / 3 * 4);
+                                    for chunk in bytes.chunks(3) {
+                                        let b = match chunk.len() {
+                                            3 => (chunk[0] as u32) << 16 | (chunk[1] as u32) << 8 | (chunk[2] as u32),
+                                            2 => (chunk[0] as u32) << 16 | (chunk[1] as u32) << 8,
+                                            1 => (chunk[0] as u32) << 16,
+                                            _ => 0,
+                                        };
+                                        b64.push(CHARSET[(b >> 18 & 0x3F) as usize] as char);
+                                        b64.push(CHARSET[(b >> 12 & 0x3F) as usize] as char);
+                                        if chunk.len() > 1 {
+                                            b64.push(CHARSET[(b >> 6 & 0x3F) as usize] as char);
+                                        } else {
+                                            b64.push('=');
+                                        }
+                                        if chunk.len() > 2 {
+                                            b64.push(CHARSET[(b & 0x3F) as usize] as char);
+                                        } else {
+                                            b64.push('=');
+                                        }
+                                    }
+                                    wallpaper_base64 = Some(format!("data:image/jpeg;base64,{}", b64));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SystemThemeColors {
+        accent_hex,
+        wallpaper_base64,
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Configure WebView2 Chromium runtime for minimal RAM footprint
@@ -425,7 +515,8 @@ pub fn run() {
             trim_memory,
             win_minimize,
             win_toggle_maximize,
-            win_close
+            win_close,
+            get_system_theme_colors
         ])
         .run(tauri::generate_context!())
         .expect("error while running ymusic application");

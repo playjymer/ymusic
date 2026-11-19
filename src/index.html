@@ -483,6 +483,74 @@
         </div>
 
         <div class="settings-modal-body">
+          <!-- 0. MATERIAL YOU COLOR THEME & MONET ENGINE -->
+          <div class="settings-section">
+            <div class="section-headline-row">
+              <div class="section-title">ЦВЕТОВАЯ ПАЛИТРА И ТЕМА (MATERIAL YOU / MONET)</div>
+              <span id="active-theme-name" class="opt-value-badge highlight">Персик (Pixel)</span>
+            </div>
+            
+            <!-- Dynamic Modes Row -->
+            <div class="theme-modes-row">
+              <button type="button" class="theme-mode-btn" data-theme-mode="album" id="theme-btn-album">
+                <span class="theme-mode-icon">🖼️</span>
+                <div class="theme-mode-info">
+                  <span class="theme-mode-title">Авто под обложку</span>
+                  <span class="theme-mode-sub">Адаптация под играющий трек</span>
+                </div>
+              </button>
+
+              <button type="button" class="theme-mode-btn" data-theme-mode="system" id="theme-btn-system">
+                <span class="theme-mode-icon">💻</span>
+                <div class="theme-mode-info">
+                  <span class="theme-mode-title">Авто под систему</span>
+                  <span class="theme-mode-sub">Акцентный цвет Windows</span>
+                </div>
+              </button>
+
+              <button type="button" class="theme-mode-btn" data-theme-mode="wallpaper" id="theme-btn-wallpaper">
+                <span class="theme-mode-icon">🌄</span>
+                <div class="theme-mode-info">
+                  <span class="theme-mode-title">Авто под обои</span>
+                  <span class="theme-mode-sub">Цвет рабочего стола Windows</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Ready Presets Palette Grid -->
+            <div class="theme-presets-label">Готовые пресеты Pixel:</div>
+            <div class="theme-presets-grid" id="theme-presets-grid">
+              <button type="button" class="theme-preset-card active" data-preset="terracotta">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #ff897d 0%, #772b1d 100%);"></span>
+                <span class="preset-name">Персик</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="sage">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #8ed5a2 0%, #1b4e2f 100%);"></span>
+                <span class="preset-name">Шалфей</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="sky">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #99cbff 0%, #164676 100%);"></span>
+                <span class="preset-name">Лазурь</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="lavender">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #d5bbfb 0%, #4c3375 100%);"></span>
+                <span class="preset-name">Лаванда</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="amber">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #eac248 0%, #584400 100%);"></span>
+                <span class="preset-name">Янтарь</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="rose">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #ff839a 0%, #721f37 100%);"></span>
+                <span class="preset-name">Коралл</span>
+              </button>
+              <button type="button" class="theme-preset-card" data-preset="monochrome">
+                <span class="preset-swatch" style="background: linear-gradient(135deg, #c7c6ca 0%, #3b3b3e 100%);"></span>
+                <span class="preset-name">Монохром</span>
+              </button>
+            </div>
+          </div>
+
           <!-- 1. STUDIO EQUALIZER SECTION -->
           <div class="settings-section">
             <div class="section-headline-row">

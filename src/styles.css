@@ -1228,7 +1228,7 @@ body.in-main-view #dock-now-playing {
 /* Iconic Google Pixel Squiggly Scrubber (Animated Sine Wave) */
 body.audio-playing .scrubber-active {
   background-color: transparent !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: var(--squiggly-wave-bg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")) !important;
   background-repeat: repeat-x;
   background-size: 20px 8px;
   background-position-y: center;
@@ -2232,13 +2232,115 @@ body.audio-playing .scrubber-active {
 }
 
 .settings-section {
-  background: rgba(14, 16, 25, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 16px 18px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
+  gap: 14px;
+}
+
+/* Material You Color Theme & Monet Modes */
+.theme-modes-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.theme-mode-btn {
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-lg);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
   gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s var(--ease-snappy);
+}
+
+.theme-mode-btn:hover {
+  background: var(--md-sys-color-surface-container-highest);
+  transform: translateY(-1px);
+}
+
+.theme-mode-btn.active {
+  background: var(--md-sys-color-secondary-container) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.theme-mode-icon {
+  font-size: 22px;
+}
+
+.theme-mode-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.theme-mode-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--md-sys-color-on-surface);
+}
+
+.theme-mode-sub {
+  font-size: 11px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.theme-presets-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-top: 4px;
+}
+
+.theme-presets-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-preset-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--md-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-snappy);
+}
+
+.theme-preset-card:hover {
+  background: var(--md-sys-color-surface-container-highest);
+  transform: translateY(-1px);
+}
+
+.theme-preset-card.active {
+  background: var(--md-sys-color-secondary-container) !important;
+  border-color: var(--md-sys-color-primary) !important;
+}
+
+.preset-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.preset-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
 }
 
 .section-headline-row {
@@ -3284,7 +3386,7 @@ body.audio-playing .scrubber-active {
 
 body.audio-playing #fs-progress-fill {
   background-color: transparent !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-image: var(--squiggly-wave-bg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")) !important;
   background-repeat: repeat-x !important;
   background-size: 20px 8px !important;
   background-position-y: center !important;
