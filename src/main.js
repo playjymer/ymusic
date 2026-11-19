@@ -588,15 +588,158 @@ function renderQueue() {
   }
 }
 
+// --------------------------------------------------------------------------
+// ORGANIC WATER SPILL TRANSITION ENGINE ("РАЗЛИТАЯ ВОДА РАСТЕКАЕТСЯ ПО СТОЛУ")
+// --------------------------------------------------------------------------
+let waterSpillAnimId = null;
+
+function triggerOrganicWaterSpill(oldSrc, newSrc, direction = 'next') {
+  const canvas = document.getElementById('cover-water-canvas');
+  const dockCanvas = document.getElementById('dock-water-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const dockCtx = dockCanvas ? dockCanvas.getContext('2d') : null;
+
+  if (waterSpillAnimId) {
+    cancelAnimationFrame(waterSpillAnimId);
+    waterSpillAnimId = null;
+  }
+
+  if (!oldSrc || oldSrc === newSrc) return;
+
+  const imgOld = new Image();
+  imgOld.crossOrigin = 'anonymous';
+  imgOld.src = oldSrc;
+
+  const imgNew = new Image();
+  imgNew.crossOrigin = 'anonymous';
+  imgNew.src = newSrc;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const isNext = direction !== 'prev';
+
+  // Water spill origin: splashes organically from the side and floods the surface
+  const originX = isNext ? w * 0.24 : w * 0.76;
+  const originY = h * 0.46;
+  const maxRadius = Math.hypot(w, h) * 1.18;
+
+  canvas.classList.add('is-spilling');
+  if (dockCanvas) dockCanvas.classList.add('is-spilling');
+
+  const duration = 1150; // 1.15 seconds: calm, unhurried, visible liquid flow
+  const startTime = performance.now();
+
+  function renderFrame(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(1.0, elapsed / duration);
+
+    // Fluid deceleration: fast initial splash, then viscous spreading
+    const p = 1 - Math.pow(1 - t, 3.2);
+    const baseRadius = p * maxRadius;
+    const waveTime = elapsed * 0.005;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // 1. Draw old image (the table underneath)
+    if (imgOld.complete && imgOld.naturalWidth > 0) {
+      ctx.drawImage(imgOld, 0, 0, w, h);
+    }
+
+    if (dockCtx && dockCanvas) {
+      dockCtx.clearRect(0, 0, dockCanvas.width, dockCanvas.height);
+      if (imgOld.complete && imgOld.naturalWidth > 0) {
+        dockCtx.drawImage(imgOld, 0, 0, dockCanvas.width, dockCanvas.height);
+      }
+    }
+
+    // 2. Build organic wavy liquid puddle with 24 harmonic points
+    if (baseRadius > 1) {
+      ctx.save();
+      ctx.beginPath();
+      const numPoints = 24;
+      const points = [];
+
+      for (let i = 0; i < numPoints; i++) {
+        const angle = (i / numPoints) * Math.PI * 2;
+        // Fluid harmonics: natural liquid lobes & ripples
+        const wave1 = Math.sin(angle * 3 + waveTime * 3.6) * 0.11;
+        const wave2 = Math.cos(angle * 5 - waveTime * 2.8) * 0.07;
+        const wave3 = Math.sin(angle * 7 + waveTime * 4.4) * 0.035;
+        const r = Math.max(0, baseRadius * (1 + wave1 + wave2 + wave3));
+
+        points.push({
+          x: originX + Math.cos(angle) * r,
+          y: originY + Math.sin(angle) * r
+        });
+      }
+
+      ctx.moveTo((points[0].x + points[numPoints - 1].x) / 2, (points[0].y + points[numPoints - 1].y) / 2);
+      for (let i = 0; i < numPoints; i++) {
+        const nextIdx = (i + 1) % numPoints;
+        const midX = (points[i].x + points[nextIdx].x) / 2;
+        const midY = (points[i].y + points[nextIdx].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
+      }
+      ctx.closePath();
+
+      // Clip and draw new image (the spilled water)
+      ctx.clip();
+      if (imgNew.complete && imgNew.naturalWidth > 0) {
+        ctx.drawImage(imgNew, 0, 0, w, h);
+      }
+      ctx.restore();
+
+      // 3. Draw wet glossy meniscus boundary
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo((points[0].x + points[numPoints - 1].x) / 2, (points[0].y + points[numPoints - 1].y) / 2);
+      for (let i = 0; i < numPoints; i++) {
+        const nextIdx = (i + 1) % numPoints;
+        const midX = (points[i].x + points[nextIdx].x) / 2;
+        const midY = (points[i].y + points[nextIdx].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
+      }
+      ctx.closePath();
+
+      const edgeAlpha = Math.max(0, 1 - p * 0.95);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = `rgba(255, 255, 255, ${edgeAlpha * 0.55})`;
+      ctx.stroke();
+
+      ctx.lineWidth = 14;
+      ctx.strokeStyle = `rgba(255, 255, 255, ${edgeAlpha * 0.20})`;
+      ctx.stroke();
+      ctx.restore();
+
+      // Sync to dock mini canvas
+      if (dockCtx && dockCanvas) {
+        dockCtx.drawImage(canvas, 0, 0, dockCanvas.width, dockCanvas.height);
+      }
+    }
+
+    if (t < 1.0) {
+      waterSpillAnimId = requestAnimationFrame(renderFrame);
+    } else {
+      waterSpillAnimId = null;
+      canvas.classList.remove('is-spilling');
+      if (dockCanvas) dockCanvas.classList.remove('is-spilling');
+      ctx.clearRect(0, 0, w, h);
+      if (dockCtx && dockCanvas) dockCtx.clearRect(0, 0, dockCanvas.width, dockCanvas.height);
+    }
+  }
+
+  waterSpillAnimId = requestAnimationFrame(renderFrame);
+}
+
 function setTrackPreview(track, direction = 'next') {
   if (!track) return;
   const cover = track.cover_url || 'assets/default-cover.svg';
 
-  const trackCoverBack = document.getElementById('track-cover-back');
-
-  // Preserve previous cover in back layer so the new cover crossfades seamlessly over it
-  if (trackCoverBack && trackCoverMain && trackCoverMain.src && trackCoverMain.src !== cover) {
-    trackCoverBack.src = trackCoverMain.src;
+  const oldCover = trackCoverMain ? trackCoverMain.src : '';
+  if (oldCover && oldCover !== cover && !oldCover.endsWith('default-cover.svg')) {
+    triggerOrganicWaterSpill(oldCover, cover, direction);
   }
 
   trackCoverMain.src = cover;
@@ -630,10 +773,6 @@ function setTrackPreview(track, direction = 'next') {
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
   // Sync Universal Bottom Dock
-  const dockThumbBack = document.getElementById('dock-thumb-back');
-  if (dockThumbBack && dockThumb && dockThumb.src && dockThumb.src !== cover) {
-    dockThumbBack.src = dockThumb.src;
-  }
   if (dockThumb) dockThumb.src = cover;
   if (dockTitle) dockTitle.textContent = track.title;
   if (dockArtist) {
@@ -659,23 +798,17 @@ function setTrackPreview(track, direction = 'next') {
 
   // Pure GPU Composited Directional Transitions (Batched in single animation frame without layout reflows)
   const isNext = direction !== 'prev';
-  const coverCls = isNext ? 'anim-cover-next' : 'anim-cover-prev';
   const textCls = isNext ? 'anim-text-next' : 'anim-text-prev';
-  const dockThumbCls = isNext ? 'anim-dock-thumb-next' : 'anim-dock-thumb-prev';
   const dockMetaCls = isNext ? 'anim-dock-meta-next' : 'anim-dock-meta-prev';
 
   const dockMeta = document.getElementById('dock-meta');
   const infoDeck = document.querySelector('.track-info-deck');
 
-  trackCoverMain.classList.remove('anim-cover-next', 'anim-cover-prev');
   if (infoDeck) infoDeck.classList.remove('anim-text-next', 'anim-text-prev', 'track-anim-enter');
-  if (dockThumb) dockThumb.classList.remove('anim-dock-thumb-next', 'anim-dock-thumb-prev');
   if (dockMeta) dockMeta.classList.remove('anim-dock-meta-next', 'anim-dock-meta-prev');
 
   requestAnimationFrame(() => {
-    trackCoverMain.classList.add(coverCls);
     if (infoDeck) infoDeck.classList.add(textCls);
-    if (dockThumb) dockThumb.classList.add(dockThumbCls);
     if (dockMeta) dockMeta.classList.add(dockMetaCls);
   });
 
