@@ -775,132 +775,44 @@ body.in-main-view #dock-now-playing {
 }
 
 /* --------------------------------------------------------------------------
-   SILKY SMOOTH GPU TRACK TRANSITIONS (120 FPS PURE COMPOSITOR)
+   PURE STATIONARY CROSSFADE TRANSITIONS ("ПЕРЕЛИВАНИЕ БЕЗ СДВИГОВ И ПРЫЖКОВ")
    -------------------------------------------------------------------------- */
 
-@keyframes coverCrossfadeNext {
+@keyframes pureCrossfadeIn {
   0% {
     opacity: 0;
-    transform: translateX(20px) scale(0.97);
   }
   100% {
     opacity: 1;
-    transform: translateX(0) scale(1);
   }
 }
 
-@keyframes coverCrossfadePrev {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
-.anim-cover-next {
-  animation: coverCrossfadeNext 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
-}
-
+.anim-cover-fade,
+.anim-cover-next,
 .anim-cover-prev {
-  animation: coverCrossfadePrev 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
+  animation: pureCrossfadeIn 0.36s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: opacity;
 }
 
-@keyframes textCrossfadeNext {
-  0% {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes textCrossfadePrev {
-  0% {
-    opacity: 0;
-    transform: translateX(-16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.anim-text-next {
-  animation: textCrossfadeNext 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
-}
-
+.anim-text-fade,
+.anim-text-next,
 .anim-text-prev {
-  animation: textCrossfadePrev 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
+  animation: pureCrossfadeIn 0.30s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: opacity;
 }
 
-/* Bottom Dock Directional Track Switch Animations */
-@keyframes dockThumbNextIn {
-  0% {
-    opacity: 0.15;
-    transform: translateX(20px) scale(0.85);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
-@keyframes dockThumbPrevIn {
-  0% {
-    opacity: 0.15;
-    transform: translateX(-20px) scale(0.85);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
-@keyframes dockMetaNextIn {
-  0% {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes dockMetaPrevIn {
-  0% {
-    opacity: 0;
-    transform: translateX(-16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.anim-dock-thumb-next {
-  animation: dockThumbNextIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
+.anim-dock-thumb-fade,
+.anim-dock-thumb-next,
 .anim-dock-thumb-prev {
-  animation: dockThumbPrevIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: pureCrossfadeIn 0.30s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: opacity;
 }
 
-.anim-dock-meta-next {
-  animation: dockMetaNextIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
+.anim-dock-meta-fade,
+.anim-dock-meta-next,
 .anim-dock-meta-prev {
-  animation: dockMetaPrevIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: pureCrossfadeIn 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: opacity;
 }
 
 /* Mini Equalizer inside active Queue card */
