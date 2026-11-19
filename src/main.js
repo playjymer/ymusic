@@ -593,35 +593,14 @@ function setTrackPreview(track, direction = 'next') {
   const cover = track.cover_url || 'assets/default-cover.svg';
 
   const trackCoverBack = document.getElementById('track-cover-back');
-  const coverSheen = document.getElementById('cover-sheen');
 
-  // Preserve previous cover in back layer so the new cover liquidly washes/pours over it
+  // Preserve previous cover in back layer so the new cover crossfades seamlessly over it
   if (trackCoverBack && trackCoverMain && trackCoverMain.src && trackCoverMain.src !== cover) {
     trackCoverBack.src = trackCoverMain.src;
   }
 
   trackCoverMain.src = cover;
   trackTitleMain.textContent = track.title;
-
-  // Shimmering iridescent text wave on title ("переливание букв названия")
-  trackTitleMain.classList.remove('anim-title-shimmer-next', 'anim-title-shimmer-prev');
-  void trackTitleMain.offsetWidth;
-  trackTitleMain.classList.add(direction === 'prev' ? 'anim-title-shimmer-prev' : 'anim-title-shimmer-next');
-  trackTitleMain.addEventListener('animationend', () => {
-    trackTitleMain.classList.remove('anim-title-shimmer-next', 'anim-title-shimmer-prev');
-  }, { once: true });
-
-  // Liquid light sheen sweep across the cover
-  if (coverSheen) {
-    coverSheen.classList.remove('sheen-sweep-next', 'sheen-sweep-prev');
-    void coverSheen.offsetWidth;
-    coverSheen.classList.add(direction === 'prev' ? 'sheen-sweep-prev' : 'sheen-sweep-next');
-  }
-
-  // Directional liquid morph animation on cover
-  trackCoverMain.classList.remove('anim-cover-next', 'anim-cover-prev');
-  void trackCoverMain.offsetWidth;
-  trackCoverMain.classList.add(direction === 'prev' ? 'anim-cover-prev' : 'anim-cover-next');
   
   if (typeof onTrackChangedForTheme === 'function') {
     onTrackChangedForTheme(cover, track.title);
@@ -651,12 +630,7 @@ function setTrackPreview(track, direction = 'next') {
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
   // Sync Universal Bottom Dock
-  if (dockThumb) {
-    dockThumb.src = cover;
-    dockThumb.classList.remove('anim-dock-thumb-next', 'anim-dock-thumb-prev');
-    void dockThumb.offsetWidth; // force reflow
-    dockThumb.classList.add(direction === 'prev' ? 'anim-dock-thumb-prev' : 'anim-dock-thumb-next');
-  }
+  if (dockThumb) dockThumb.src = cover;
   if (dockTitle) dockTitle.textContent = track.title;
   if (dockArtist) {
     dockArtist.innerHTML = '';
@@ -679,20 +653,27 @@ function setTrackPreview(track, direction = 'next') {
     });
   }
 
-  const dockMeta = document.getElementById('dock-meta');
-  if (dockMeta) {
-    dockMeta.classList.remove('anim-dock-meta-next', 'anim-dock-meta-prev');
-    void dockMeta.offsetWidth; // force reflow
-    dockMeta.classList.add(direction === 'prev' ? 'anim-dock-meta-prev' : 'anim-dock-meta-next');
-  }
+  // Pure GPU Composited Directional Transitions (Batched in single animation frame without layout reflows)
+  const isNext = direction !== 'prev';
+  const coverCls = isNext ? 'anim-cover-next' : 'anim-cover-prev';
+  const textCls = isNext ? 'anim-text-next' : 'anim-text-prev';
+  const dockThumbCls = isNext ? 'anim-dock-thumb-next' : 'anim-dock-thumb-prev';
+  const dockMetaCls = isNext ? 'anim-dock-meta-next' : 'anim-dock-meta-prev';
 
-  // Directional liquid typography slide-in for info deck
+  const dockMeta = document.getElementById('dock-meta');
   const infoDeck = document.querySelector('.track-info-deck');
-  if (infoDeck) {
-    infoDeck.classList.remove('anim-text-next', 'anim-text-prev', 'track-anim-enter');
-    void infoDeck.offsetWidth;
-    infoDeck.classList.add(direction === 'prev' ? 'anim-text-prev' : 'anim-text-next');
-  }
+
+  trackCoverMain.classList.remove('anim-cover-next', 'anim-cover-prev');
+  if (infoDeck) infoDeck.classList.remove('anim-text-next', 'anim-text-prev', 'track-anim-enter');
+  if (dockThumb) dockThumb.classList.remove('anim-dock-thumb-next', 'anim-dock-thumb-prev');
+  if (dockMeta) dockMeta.classList.remove('anim-dock-meta-next', 'anim-dock-meta-prev');
+
+  requestAnimationFrame(() => {
+    trackCoverMain.classList.add(coverCls);
+    if (infoDeck) infoDeck.classList.add(textCls);
+    if (dockThumb) dockThumb.classList.add(dockThumbCls);
+    if (dockMeta) dockMeta.classList.add(dockMetaCls);
+  });
 
   // Update MediaSession & Windows SMTC Overlay
   updateMediaSession(track);
