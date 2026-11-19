@@ -1,36 +1,81 @@
 /* ==========================================================================
-   YANDEX MUSIC RUST CLIENT - HIGH-CRAFT REFINED CONSOLE
-   Custom Titlebar | Zero Page Scroll | Smooth Physics | Reorganized Sidebar
+   YANDEX MUSIC - MATERIAL DESIGN 3 (M3 / MATERIAL YOU) CONSOLE
+   Tonal Elevation Surfaces | M3 Shape Scale | Pill Navigation | Dynamic Accents
    ========================================================================== */
 
 :root {
-  --bg-app: #08090e;
-  --bg-sidebar: #0e1018;
-  --bg-stage: #11131e;
-  --bg-panel: #0d0f17;
-  --bg-card: #151825;
-  --bg-card-hover: rgba(255, 255, 255, 0.07);
-  --bg-card-active: rgba(255, 255, 255, 0.12);
+  /* 1. M3 Tonal Surfaces (Dark Theme) */
+  --md-sys-color-background: #0f1013;
+  --md-sys-color-surface: #121316;
+  --md-sys-color-surface-dim: #111215;
+  --md-sys-color-surface-bright: #37393e;
+  --md-sys-color-surface-container-lowest: #0c0d10;
+  --md-sys-color-surface-container-low: #18191d;
+  --md-sys-color-surface-container: #1e1f24;
+  --md-sys-color-surface-container-high: #27282e;
+  --md-sys-color-surface-container-highest: #32333a;
+  --md-sys-color-surface-variant: #44464f;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.18);
-  --border-active: #fc3f1d;
+  /* 2. M3 Content & Text Hierarchy */
+  --md-sys-color-on-background: #e4e2e6;
+  --md-sys-color-on-surface: #e4e2e6;
+  --md-sys-color-on-surface-variant: #c6c6ca;
+  --md-sys-color-outline: #8d8f96;
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.08);
 
-  --accent-brand: #fc3f1d;
-  --accent-amber: #ff9f1c;
-  --accent-cyan: #00f0ff;
-  --accent-gradient: linear-gradient(135deg, #fc3f1d 0%, #ff2d55 50%, #7928ca 100%);
-  --accent-glow: rgba(252, 63, 29, 0.45);
+  /* 3. M3 Vibrant Music Accents (YMusic Dynamic Coral Core) */
+  --md-sys-color-primary: #ff5436;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: rgba(255, 84, 54, 0.18);
+  --md-sys-color-on-primary-container: #ffdad3;
 
-  --text-main: #ffffff;
-  --text-dim: #9aa1ba;
-  --text-muted: #5e647c;
+  --md-sys-color-secondary: #e7bdb4;
+  --md-sys-color-on-secondary: #442a24;
+  --md-sys-color-secondary-container: #463430;
+  --md-sys-color-on-secondary-container: #ffdad3;
+
+  --md-sys-color-tertiary: #67d6ec;
+  --md-sys-color-on-tertiary: #00363d;
+  --md-sys-color-tertiary-container: rgba(103, 214, 236, 0.16);
+  --md-sys-color-on-tertiary-container: #9eeffd;
+
+  /* Backward compatibility aliases */
+  --bg-app: var(--md-sys-color-background);
+  --bg-sidebar: var(--md-sys-color-surface-container-low);
+  --bg-stage: var(--md-sys-color-surface);
+  --bg-panel: var(--md-sys-color-surface-container);
+  --bg-card: var(--md-sys-color-surface-container);
+  --bg-card-hover: var(--md-sys-color-surface-container-high);
+  --bg-card-active: var(--md-sys-color-surface-container-highest);
+
+  --border-subtle: var(--md-sys-color-outline-variant);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-active: var(--md-sys-color-primary);
+
+  --accent-brand: var(--md-sys-color-primary);
+  --accent-amber: #ffb74d;
+  --accent-cyan: var(--md-sys-color-tertiary);
+  --accent-gradient: linear-gradient(135deg, #ff5436 0%, #ff7d66 100%);
+  --accent-glow: rgba(255, 84, 54, 0.35);
+
+  --text-main: var(--md-sys-color-on-surface);
+  --text-dim: var(--md-sys-color-on-surface-variant);
+  --text-muted: var(--md-sys-color-outline);
 
   --font-display: 'Unbounded', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+  /* 4. M3 Shape Scale (Corner Radii) */
+  --md-shape-xs: 4px;
+  --md-shape-sm: 8px;
+  --md-shape-md: 12px;
+  --md-shape-lg: 16px;
+  --md-shape-xl: 28px;
+  --md-shape-full: 9999px;
+
+  /* 5. M3 Motion & Easing */
+  --ease-snappy: cubic-bezier(0.2, 0.0, 0, 1.0);
   --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -282,28 +327,28 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   3. CONSOLE BODY (2 SPACIOUS PANELS: SIDEBAR + STAGE)
+   3. CONSOLE BODY (M3 2-PANEL LAYOUT: SIDEBAR DRAWER + STAGE CONTAINER)
    -------------------------------------------------------------------------- */
 .console-body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 230px 1fr;
+  grid-template-columns: 240px 1fr;
   gap: 14px;
   padding: 12px 14px;
   overflow: hidden;
 }
 
 /* --------------------------------------------------------------------------
-   PANEL 1: SIDEBAR (Redesigned & Organized)
+   PANEL 1: SIDEBAR (M3 Navigation Drawer Specification)
    -------------------------------------------------------------------------- */
 .sidebar-panel {
-  background: var(--bg-sidebar);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
   display: flex;
   flex-direction: column;
-  padding: 16px 14px;
+  padding: 18px 14px;
   gap: 16px;
   min-height: 0;
   overflow: hidden;
@@ -312,70 +357,66 @@ html, body {
 .menu-section {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .menu-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--md-sys-color-primary);
   letter-spacing: 0.8px;
   margin-bottom: 6px;
-  padding-left: 6px;
+  padding-left: 12px;
+  text-transform: uppercase;
 }
 
+/* M3 Navigation Item (Signature Pill Active State) */
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 8px;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--md-shape-full);
   background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-dim);
+  border: none;
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--ease-snappy);
+  transition: background 0.18s var(--ease-snappy), color 0.18s var(--ease-snappy), transform 0.18s var(--ease-snappy);
   position: relative;
   text-align: left;
 }
 
 .menu-item:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-main);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
   transform: translateX(2px);
 }
 
 .menu-item.active {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--md-sys-color-secondary-container) !important;
+  color: var(--md-sys-color-on-secondary-container) !important;
+  font-weight: 700;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .menu-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--accent-brand);
-  box-shadow: 0 0 10px var(--accent-brand);
+  display: none;
 }
 
 .pulse-indicator {
   position: absolute;
-  right: 12px;
-  width: 6px;
-  height: 6px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--accent-brand);
-  box-shadow: 0 0 6px var(--accent-brand);
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 8px var(--md-sys-color-primary);
 }
 
 .menu-icon {
@@ -407,112 +448,122 @@ html, body {
   border-radius: 4px;
 }
 
+/* M3 Filter Chips (Mood & Vibe) */
 .vibe-pill {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 6px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-dim);
+  padding: 8px 10px;
+  border-radius: var(--md-shape-md);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--ease-bounce);
+  transition: all 0.2s var(--ease-snappy);
   white-space: nowrap;
 }
 
 .vibe-pill:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: white;
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 .vibe-pill.active {
-  background: linear-gradient(135deg, rgba(252, 63, 29, 0.28), rgba(255, 45, 85, 0.18));
-  border-color: var(--accent-brand);
-  color: white;
-  box-shadow: 0 4px 14px rgba(252, 63, 29, 0.3);
+  background: var(--md-sys-color-primary-container) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary-container) !important;
+  box-shadow: 0 2px 10px rgba(255, 84, 54, 0.25);
+  font-weight: 700;
 }
 
-/* Sidebar Volume Dock */
+/* M3 Elevated Volume Card */
 .sidebar-volume-dock {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-lg);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .vol-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 11px;
   font-weight: 700;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .vol-percent {
-  color: var(--accent-amber);
+  color: var(--md-sys-color-primary);
+  font-family: var(--font-mono);
 }
 
 .vol-controls-line {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .mute-btn {
   background: transparent;
   border: none;
-  color: var(--text-dim);
+  color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
   font-size: 14px;
   padding: 2px;
-  transition: transform 0.15s;
+  transition: transform 0.15s, color 0.15s;
 }
 
 .mute-btn:hover {
   transform: scale(1.15);
+  color: var(--md-sys-color-on-surface);
 }
 
 .vol-controls-line input[type="range"] {
   -webkit-appearance: none;
   flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.15);
+  height: 6px;
+  border-radius: var(--md-shape-full);
+  background: var(--md-sys-color-surface-container-highest);
   outline: none;
   cursor: pointer;
 }
 
 .vol-controls-line input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--accent-brand);
+  background: var(--md-sys-color-primary);
   cursor: pointer;
-  box-shadow: 0 0 8px var(--accent-brand);
+  box-shadow: 0 0 8px rgba(255, 84, 54, 0.5);
+  transition: transform 0.15s ease;
+}
+
+.vol-controls-line input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
 }
 
 /* --------------------------------------------------------------------------
-   PANEL 2: CENTER STAGE (Visualizer, Track, Controls)
+   PANEL 2: CENTER STAGE (M3 Surface Stage)
    -------------------------------------------------------------------------- */
 .stage-panel {
-  background: var(--bg-stage);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
   display: flex;
   flex-direction: column;
-  padding: 16px 20px;
+  padding: 18px 22px;
   min-height: 0;
   overflow: hidden;
   position: relative;
@@ -618,69 +669,71 @@ body.in-main-view #dock-now-playing {
   color: var(--text-muted);
 }
 
+/* M3 Segmented Button Group (Visualizer Modes) */
 .vis-mode-switch {
   display: flex;
-  gap: 6px;
+  gap: 2px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-full);
+  padding: 2px;
 }
 
 .vis-toggle-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 3px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--md-shape-full);
+  padding: 4px 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-dim);
+  color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s var(--ease-snappy);
 }
 
 .vis-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
 }
 
 .vis-toggle-btn.active {
-  background: rgba(252, 63, 29, 0.18);
-  border-color: var(--accent-brand);
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(252, 63, 29, 0.35);
+  background: var(--md-sys-color-secondary-container) !important;
+  color: var(--md-sys-color-on-secondary-container) !important;
+  font-weight: 700;
+  box-shadow: none !important;
 }
 
-/* Central Track Deck - High-Craft Modern Music Hero */
+/* Central Track Deck - M3 Elevated Hero Card */
 .track-identity-deck {
   display: flex;
   align-items: center;
   gap: 36px;
-  padding: 24px 28px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  padding: 26px 30px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
 .cover-wrapper {
   position: relative;
   width: 216px;
   height: 216px;
-  border-radius: 18px;
-  background: #151824;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.75);
+  border-radius: 20px;
+  background: var(--md-sys-color-surface-container-highest);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
   flex-shrink: 0;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.3s var(--ease-snappy), box-shadow 0.3s ease;
 }
 
 .cover-wrapper:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75);
 }
 
 .cover-main-img {
@@ -931,15 +984,15 @@ body.in-main-view #dock-now-playing {
   margin-top: 4px;
 }
 
-/* Yandex Music Sleek Pill Buttons */
+/* M3 Pill Action Buttons (Full-Pill Elevation) */
 .btn-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   height: 44px;
-  padding: 0 18px;
-  border-radius: 12px;
+  padding: 0 20px;
+  border-radius: var(--md-shape-full);
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
@@ -947,7 +1000,7 @@ body.in-main-view #dock-now-playing {
   outline: none;
   user-select: none;
   white-space: nowrap;
-  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: transform 0.16s var(--ease-snappy),
               background 0.16s ease,
               border-color 0.16s ease,
               box-shadow 0.16s ease,
@@ -959,43 +1012,41 @@ body.in-main-view #dock-now-playing {
   outline: none;
 }
 
-/* Primary Coral Pill: "Запустить Мою волну" / "Пауза" */
+/* Primary M3 Filled Button: "Запустить Мою волну" / "Пауза" */
 .btn-pill-primary {
-  background: linear-gradient(135deg, #ff4c28 0%, #ff5e38 100%);
+  background: var(--md-sys-color-primary);
   border: none;
-  color: #ffffff;
+  color: var(--md-sys-color-on-primary);
   font-family: var(--font-display);
   font-size: 13.5px;
   font-weight: 700;
   letter-spacing: -0.2px;
-  padding: 0 22px;
-  box-shadow: 0 6px 20px rgba(255, 76, 40, 0.4);
+  padding: 0 24px;
+  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.35);
 }
 
 .btn-pill-primary:hover {
   transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 8px 26px rgba(255, 76, 40, 0.55);
+  box-shadow: 0 6px 20px rgba(255, 84, 54, 0.5);
   filter: brightness(1.08);
 }
 
 .btn-pill-primary:active {
   transform: scale(0.97);
-  box-shadow: 0 3px 10px rgba(255, 76, 40, 0.35);
+  box-shadow: 0 2px 8px rgba(255, 84, 54, 0.3);
 }
 
-/* Secondary Frosted Glass Pills */
+/* Secondary M3 Tonal Pills */
 .btn-pill-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: rgba(255, 255, 255, 0.82);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
 }
 
 .btn-pill-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.18);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
@@ -1005,9 +1056,9 @@ body.in-main-view #dock-now-playing {
 
 /* Liked state */
 .btn-pill-secondary.liked {
-  background: rgba(255, 59, 48, 0.14) !important;
-  border-color: rgba(255, 59, 48, 0.4) !important;
-  color: #ff5b4f !important;
+  background: var(--md-sys-color-primary-container) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-primary) !important;
 }
 
 .btn-pill-secondary.liked svg {
@@ -1038,16 +1089,16 @@ body.in-main-view #dock-now-playing {
   100% { transform: scale(1); }
 }
 
-/* Universal Hardware Scrubber & Transport Dock (Always visible across all tabs) */
+/* M3 Bottom Transport Dock (Surface Container Low, 28px Radius) */
 .transport-dock {
-  background: rgba(12, 14, 22, 0.95);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 10px 16px;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
+  padding: 12px 20px;
   margin-top: 10px;
   flex-shrink: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
 }
 
 .dock-layout {
@@ -1064,17 +1115,17 @@ body.in-main-view #dock-now-playing {
   min-width: 170px;
   max-width: 240px;
   padding-right: 14px;
-  border-right: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .dock-thumb-img {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: var(--md-shape-md);
   object-fit: cover;
   flex-shrink: 0;
-  background: #171a27;
-  border: 1px solid var(--border-subtle);
+  background: var(--md-sys-color-surface-container-highest);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .dock-meta {
@@ -1088,15 +1139,15 @@ body.in-main-view #dock-now-playing {
 .dock-title-text {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--md-sys-color-on-surface);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .dock-artist-text {
-  font-size: 11px;
-  color: var(--text-dim);
+  font-size: 11.5px;
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1105,7 +1156,7 @@ body.in-main-view #dock-now-playing {
 .dock-mini-like {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--md-sys-color-outline);
   cursor: pointer;
   padding: 6px;
   display: flex;
@@ -1117,16 +1168,16 @@ body.in-main-view #dock-now-playing {
 }
 
 .dock-mini-like:hover {
-  color: var(--accent-brand);
+  color: var(--md-sys-color-primary);
   transform: scale(1.15);
 }
 
 .dock-mini-like.liked {
-  color: var(--accent-brand) !important;
+  color: var(--md-sys-color-primary) !important;
 }
 
 .dock-mini-like.liked svg {
-  fill: var(--accent-brand) !important;
+  fill: var(--md-sys-color-primary) !important;
 }
 
 .dock-controls-block {
@@ -1147,16 +1198,16 @@ body.in-main-view #dock-now-playing {
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--md-sys-color-outline);
   min-width: 38px;
 }
 
 .scrubber-trough {
   flex: 1;
   height: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border-subtle);
-  border-radius: 3px;
+  background: var(--md-sys-color-surface-container-highest);
+  border: none;
+  border-radius: var(--md-shape-full);
   position: relative;
   cursor: pointer;
   transition: height 0.15s ease;
@@ -1172,8 +1223,8 @@ body.in-main-view #dock-now-playing {
   left: 0;
   bottom: 0;
   width: 0%;
-  background: var(--accent-gradient);
-  border-radius: 3px;
+  background: var(--md-sys-color-primary);
+  border-radius: var(--md-shape-full);
 }
 
 .scrubber-handle {
@@ -1183,32 +1234,32 @@ body.in-main-view #dock-now-playing {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 0 10px rgba(252, 63, 29, 0.8);
-  transform: translate(-50%, -50%) scale(0.8);
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 84, 54, 0.75);
+  transform: translate(-50%, -50%) scale(0.85);
   cursor: pointer;
   transition: transform 0.1s;
 }
 
 .scrubber-trough:hover .scrubber-handle {
-  transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.15);
 }
 
-/* Transport Buttons */
+/* Transport Buttons (M3 Circular Icon Buttons) */
 .transport-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .transport-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-dim);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--md-shape-full);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--md-sys-color-on-surface-variant);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1221,18 +1272,20 @@ body.in-main-view #dock-now-playing {
   font-weight: 800;
   font-size: 11px;
   letter-spacing: 0.8px;
+  border-radius: var(--md-shape-full);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .transport-btn.btn-dj.active {
-  color: #00f0ff !important;
-  border-color: rgba(0, 240, 255, 0.5) !important;
-  background: rgba(0, 240, 255, 0.14) !important;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
+  color: var(--md-sys-color-tertiary) !important;
+  border-color: var(--md-sys-color-tertiary) !important;
+  background: var(--md-sys-color-tertiary-container) !important;
+  box-shadow: 0 0 12px rgba(103, 214, 236, 0.4);
 }
 
 .transport-btn.btn-dj.is-mixing {
   animation: djMixingGlow 0.8s ease-in-out infinite alternate;
-  border-color: #00f0ff !important;
+  border-color: var(--md-sys-color-tertiary) !important;
 }
 
 .transport-btn.btn-dj-drop {
@@ -1240,9 +1293,10 @@ body.in-main-view #dock-now-playing {
   font-weight: 800;
   font-size: 10px;
   letter-spacing: 0.8px;
-  padding: 0 10px;
+  padding: 0 12px;
   width: auto;
   min-width: 58px;
+  border-radius: var(--md-shape-full);
   color: #ffaa00;
   border-color: rgba(255, 170, 0, 0.4);
   background: rgba(255, 170, 0, 0.1);
@@ -1264,46 +1318,48 @@ body.in-main-view #dock-now-playing {
 
 @keyframes djMixingGlow {
   0% {
-    box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 8px rgba(103, 214, 236, 0.4);
     transform: scale(1.0);
   }
   100% {
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.9), 0 0 35px rgba(255, 45, 85, 0.5);
+    box-shadow: 0 0 20px rgba(103, 214, 236, 0.9), 0 0 35px rgba(255, 84, 54, 0.5);
     transform: scale(1.08);
   }
 }
 
 .transport-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
   transform: scale(1.08);
 }
 
+/* M3 Floating Action Button (Hero Play / Pause) */
 .play-hero-btn {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #000000;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   border: none;
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
+  transition: transform 0.2s var(--ease-snappy), background 0.15s ease, box-shadow 0.2s ease;
 }
 
 .play-hero-btn:hover {
   transform: scale(1.06);
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  background: var(--md-sys-color-primary);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px rgba(255, 84, 54, 0.55);
 }
 
 .play-hero-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 84, 54, 0.3);
 }
 
 .play-hero-btn:focus,
@@ -1316,16 +1372,24 @@ body.in-main-view #dock-now-playing {
   display: block;
 }
 
-/* Search & Favorites Views */
+/* M3 Signature Search Bar (52px Full Pill) */
 .search-command-input {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 12px 18px;
-  margin-bottom: 14px;
+  gap: 14px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-full);
+  padding: 0 20px;
+  height: 52px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.search-command-input:focus-within {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-surface-container-highest);
 }
 
 .search-command-input input {
@@ -1333,17 +1397,26 @@ body.in-main-view #dock-now-playing {
   background: transparent;
   border: none;
   outline: none;
-  color: white;
+  color: var(--md-sys-color-on-surface);
   font-size: 15px;
   font-family: inherit;
+}
+
+.search-command-input input::placeholder {
+  color: var(--md-sys-color-outline);
 }
 
 .search-clear-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--md-sys-color-outline);
   cursor: pointer;
   font-size: 16px;
+  transition: color 0.15s;
+}
+
+.search-clear-btn:hover {
+  color: var(--md-sys-color-on-surface);
 }
 
 .track-scroll-grid {
@@ -1374,19 +1447,21 @@ body.in-main-view #dock-now-playing {
   background: rgba(255, 255, 255, 0.38);
 }
 
+/* M3 Interactive List Item (Track Row) */
 .console-track-row {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: var(--md-shape-lg);
   background: transparent;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.18s var(--ease-snappy);
+  margin-bottom: 2px;
 }
 
 .console-track-row:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--md-sys-color-surface-container-high);
 }
 
 .c-idx-wrap {
@@ -1401,14 +1476,14 @@ body.in-main-view #dock-now-playing {
 .c-idx {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--md-sys-color-outline);
   text-align: center;
 }
 
 .c-idx-play {
   display: none;
   font-size: 14px;
-  color: var(--accent-brand);
+  color: var(--md-sys-color-primary);
 }
 
 .console-track-row:hover .c-idx-num {
@@ -1427,12 +1502,16 @@ body.in-main-view #dock-now-playing {
   display: inline-flex;
 }
 
+.console-track-row.is-active-playing {
+  background: var(--md-sys-color-surface-container) !important;
+}
+
 .c-cover {
-  width: 42px;
-  height: 42px;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--md-shape-md);
   object-fit: cover;
-  background: #1b1e2c;
+  background: var(--md-sys-color-surface-container-highest);
   flex-shrink: 0;
 }
 
@@ -1444,6 +1523,7 @@ body.in-main-view #dock-now-playing {
 .c-title {
   font-size: 14px;
   font-weight: 700;
+  color: var(--md-sys-color-on-surface);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1451,7 +1531,7 @@ body.in-main-view #dock-now-playing {
 
 .c-artist {
   font-size: 12px;
-  color: var(--text-dim);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1461,7 +1541,7 @@ body.in-main-view #dock-now-playing {
 .c-dur {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--md-sys-color-outline);
   width: 50px;
   text-align: right;
 }
@@ -1469,9 +1549,9 @@ body.in-main-view #dock-now-playing {
 .c-row-heart-btn {
   background: transparent;
   border: none;
-  color: var(--accent-brand);
+  color: var(--md-sys-color-primary);
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1485,15 +1565,16 @@ body.in-main-view #dock-now-playing {
   opacity: 1;
 }
 
+/* M3 Elevated Hero Banner (Favorites) */
 .favorites-hero-banner {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(252, 63, 29, 0.2), rgba(121, 40, 202, 0.12));
-  border-radius: 12px;
-  border: 1px solid var(--border-subtle);
-  margin-bottom: 14px;
+  padding: 20px 24px;
+  background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-shape-xl);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  margin-bottom: 16px;
 }
 
 .fav-header-info {
@@ -1502,8 +1583,9 @@ body.in-main-view #dock-now-playing {
 
 .fav-header-info h2 {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
+  color: var(--md-sys-color-on-surface);
   margin-bottom: 4px;
 }
 
@@ -1516,30 +1598,30 @@ body.in-main-view #dock-now-playing {
 .fav-action-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  gap: 8px;
+  padding: 0 18px;
+  height: 40px;
+  border-radius: var(--md-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s var(--ease-snappy);
 }
 
 .fav-action-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--md-sys-color-surface-container-highest);
   transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .fav-action-btn.primary {
-  background: var(--accent-brand);
-  border-color: #ff5233;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(252, 63, 29, 0.4);
+  background: var(--md-sys-color-primary);
+  border: none;
+  color: var(--md-sys-color-on-primary);
+  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
 }
 
 .fav-action-btn.primary:hover {
@@ -1712,11 +1794,12 @@ body.in-main-view #dock-now-playing {
   padding: 40px 0;
 }
 
-/* Modal Window */
+/* M3 Modal Dialogs (Surface Container High, 28px Radius) */
 .modal-dim-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1724,27 +1807,27 @@ body.in-main-view #dock-now-playing {
 }
 
 .modal-dialog-box {
-  background: #111420;
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 24px;
-  width: 420px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
+  padding: 28px;
+  width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.85);
   position: relative;
 }
 
-/* Modern Auth Modal */
+/* Modern Auth Modal (M3 Specification) */
 .auth-dialog-box {
   width: 440px;
   max-width: 92vw;
   padding: 34px 30px;
-  background: linear-gradient(180deg, #151828 0%, #0d0f18 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(252, 63, 29, 0.08);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-shape-xl);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 84, 54, 0.08);
   align-items: center;
   text-align: center;
 }
@@ -3143,29 +3226,30 @@ body.in-main-view #dock-now-playing {
 }
 
 .fs-play-btn {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #000000;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   border: none;
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
+  transition: transform 0.2s var(--ease-snappy), box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .fs-play-btn:hover {
   transform: scale(1.06);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px rgba(255, 84, 54, 0.55);
 }
 
 .fs-play-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 84, 54, 0.3);
 }
 
 .fs-play-btn:focus,
