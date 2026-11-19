@@ -728,6 +728,7 @@ body.in-main-view #dock-now-playing {
   width: 216px;
   height: 216px;
   border-radius: 24px;
+  overflow: hidden;
   background: var(--md-sys-color-surface-container-highest);
   border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
@@ -748,6 +749,27 @@ body.in-main-view #dock-now-playing {
   display: block;
 }
 
+.cover-img-back {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.cover-img-front {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.cover-liquid-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .cover-glow-shadow {
   display: none;
 }
@@ -761,69 +783,250 @@ body.in-main-view #dock-now-playing {
   animation: trackFadeIn 0.32s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards;
 }
 
-/* Material 3 Fluid Track Directional Slide Transitions (Pure GPU Composited) */
-@keyframes slideNextIn {
+/* --------------------------------------------------------------------------
+   LIQUID IRIDESCENT TRACK TRANSITION ("ПЕРЕЛИВАНИЕ ОБЛОЖКИ И ТЕКСТА")
+   -------------------------------------------------------------------------- */
+
+/* 1. Liquid Cover Morph / Dissolve Wipe */
+@keyframes liquidCoverNext {
   0% {
-    opacity: 0;
-    transform: translateX(40px);
+    opacity: 0.15;
+    -webkit-mask-image: linear-gradient(115deg, transparent 0%, transparent 22%, black 65%, black 100%);
+    -webkit-mask-size: 260% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-image: linear-gradient(115deg, transparent 0%, transparent 22%, black 65%, black 100%);
+    mask-size: 260% 100%;
+    mask-position: 100% 0;
+    transform: scale(0.97) translateX(12px);
+  }
+  40% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+    transform: scale(1.0) translateX(0);
   }
 }
 
-@keyframes slidePrevIn {
+@keyframes liquidCoverPrev {
   0% {
-    opacity: 0;
-    transform: translateX(-40px);
+    opacity: 0.15;
+    -webkit-mask-image: linear-gradient(-115deg, transparent 0%, transparent 22%, black 65%, black 100%);
+    -webkit-mask-size: 260% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-image: linear-gradient(-115deg, transparent 0%, transparent 22%, black 65%, black 100%);
+    mask-size: 260% 100%;
+    mask-position: 100% 0;
+    transform: scale(0.97) translateX(-12px);
+  }
+  40% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes textNextSlide {
-  0% {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes textPrevSlide {
-  0% {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+    transform: scale(1.0) translateX(0);
   }
 }
 
 .anim-cover-next {
-  animation: slideNextIn 0.4s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;
-  will-change: transform, opacity;
+  animation: liquidCoverNext 0.54s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity, -webkit-mask-position;
 }
 
 .anim-cover-prev {
-  animation: slidePrevIn 0.4s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;
-  will-change: transform, opacity;
+  animation: liquidCoverPrev 0.54s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity, -webkit-mask-position;
+}
+
+/* 2. Liquid Sheen Wave (Световая переливающаяся волна поверх обложки) */
+@keyframes sheenSweepNext {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 30%,
+      rgba(255, 255, 255, 0.38) 50%,
+      var(--md-sys-color-primary) 58%,
+      transparent 80%
+    );
+    background-size: 260% 100%;
+    background-position: 120% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    background-position: -40% 0;
+  }
+}
+
+@keyframes sheenSweepPrev {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      -115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 30%,
+      rgba(255, 255, 255, 0.38) 50%,
+      var(--md-sys-color-primary) 58%,
+      transparent 80%
+    );
+    background-size: 260% 100%;
+    background-position: 120% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    background-position: -40% 0;
+  }
+}
+
+.sheen-sweep-next {
+  animation: sheenSweepNext 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.sheen-sweep-prev {
+  animation: sheenSweepPrev 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* 3. Liquid Typography Sweep ("Переливающийся сдвиг текста") */
+@keyframes textLiquidNext {
+  0% {
+    opacity: 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 20%, black 65%, black 100%);
+    -webkit-mask-size: 240% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-image: linear-gradient(90deg, transparent 0%, transparent 20%, black 65%, black 100%);
+    mask-size: 240% 100%;
+    mask-position: 100% 0;
+    transform: translateX(18px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes textLiquidPrev {
+  0% {
+    opacity: 0;
+    -webkit-mask-image: linear-gradient(-90deg, transparent 0%, transparent 20%, black 65%, black 100%);
+    -webkit-mask-size: 240% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-image: linear-gradient(-90deg, transparent 0%, transparent 20%, black 65%, black 100%);
+    mask-size: 240% 100%;
+    mask-position: 100% 0;
+    transform: translateX(-18px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+    transform: translateX(0);
+  }
 }
 
 .anim-text-next {
-  animation: textNextSlide 0.4s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;
-  will-change: transform, opacity;
+  animation: textLiquidNext 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity, -webkit-mask-position;
 }
 
 .anim-text-prev {
-  animation: textPrevSlide 0.4s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;
-  will-change: transform, opacity;
+  animation: textLiquidPrev 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity, -webkit-mask-position;
+}
+
+/* 4. Shimmering Iridescent Text Sheen Wave ("Переливание букв названия") */
+@keyframes titleShimmerNext {
+  0% {
+    background: linear-gradient(
+      90deg,
+      var(--md-sys-color-on-surface) 0%,
+      var(--md-sys-color-primary) 35%,
+      #ffffff 50%,
+      var(--md-sys-color-primary) 65%,
+      var(--md-sys-color-on-surface) 100%
+    );
+    background-size: 240% 100%;
+    background-position: 120% 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  100% {
+    background: linear-gradient(
+      90deg,
+      var(--md-sys-color-on-surface) 0%,
+      var(--md-sys-color-primary) 35%,
+      #ffffff 50%,
+      var(--md-sys-color-primary) 65%,
+      var(--md-sys-color-on-surface) 100%
+    );
+    background-size: 240% 100%;
+    background-position: -40% 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@keyframes titleShimmerPrev {
+  0% {
+    background: linear-gradient(
+      -90deg,
+      var(--md-sys-color-on-surface) 0%,
+      var(--md-sys-color-primary) 35%,
+      #ffffff 50%,
+      var(--md-sys-color-primary) 65%,
+      var(--md-sys-color-on-surface) 100%
+    );
+    background-size: 240% 100%;
+    background-position: 120% 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  100% {
+    background: linear-gradient(
+      -90deg,
+      var(--md-sys-color-on-surface) 0%,
+      var(--md-sys-color-primary) 35%,
+      #ffffff 50%,
+      var(--md-sys-color-primary) 65%,
+      var(--md-sys-color-on-surface) 100%
+    );
+    background-size: 240% 100%;
+    background-position: -40% 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.anim-title-shimmer-next {
+  animation: titleShimmerNext 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.anim-title-shimmer-prev {
+  animation: titleShimmerPrev 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 /* Bottom Dock Directional Track Switch Animations */

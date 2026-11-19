@@ -591,8 +591,37 @@ function renderQueue() {
 function setTrackPreview(track, direction = 'next') {
   if (!track) return;
   const cover = track.cover_url || 'assets/default-cover.svg';
+
+  const trackCoverBack = document.getElementById('track-cover-back');
+  const coverSheen = document.getElementById('cover-sheen');
+
+  // Preserve previous cover in back layer so the new cover liquidly washes/pours over it
+  if (trackCoverBack && trackCoverMain && trackCoverMain.src && trackCoverMain.src !== cover) {
+    trackCoverBack.src = trackCoverMain.src;
+  }
+
   trackCoverMain.src = cover;
   trackTitleMain.textContent = track.title;
+
+  // Shimmering iridescent text wave on title ("переливание букв названия")
+  trackTitleMain.classList.remove('anim-title-shimmer-next', 'anim-title-shimmer-prev');
+  void trackTitleMain.offsetWidth;
+  trackTitleMain.classList.add(direction === 'prev' ? 'anim-title-shimmer-prev' : 'anim-title-shimmer-next');
+  trackTitleMain.addEventListener('animationend', () => {
+    trackTitleMain.classList.remove('anim-title-shimmer-next', 'anim-title-shimmer-prev');
+  }, { once: true });
+
+  // Liquid light sheen sweep across the cover
+  if (coverSheen) {
+    coverSheen.classList.remove('sheen-sweep-next', 'sheen-sweep-prev');
+    void coverSheen.offsetWidth;
+    coverSheen.classList.add(direction === 'prev' ? 'sheen-sweep-prev' : 'sheen-sweep-next');
+  }
+
+  // Directional liquid morph animation on cover
+  trackCoverMain.classList.remove('anim-cover-next', 'anim-cover-prev');
+  void trackCoverMain.offsetWidth;
+  trackCoverMain.classList.add(direction === 'prev' ? 'anim-cover-prev' : 'anim-cover-next');
   
   if (typeof onTrackChangedForTheme === 'function') {
     onTrackChangedForTheme(cover, track.title);
@@ -657,15 +686,7 @@ function setTrackPreview(track, direction = 'next') {
     dockMeta.classList.add(direction === 'prev' ? 'anim-dock-meta-prev' : 'anim-dock-meta-next');
   }
 
-  // Directional track transition animation on cover
-  const coverWrapper = document.getElementById('cover-wrapper');
-  if (coverWrapper) {
-    coverWrapper.classList.remove('anim-cover-next', 'anim-cover-prev');
-    void coverWrapper.offsetWidth; // force reflow
-    coverWrapper.classList.add(direction === 'prev' ? 'anim-cover-prev' : 'anim-cover-next');
-  }
-
-  // Directional typography slide-in
+  // Directional liquid typography slide-in for info deck
   const infoDeck = document.querySelector('.track-info-deck');
   if (infoDeck) {
     infoDeck.classList.remove('anim-text-next', 'anim-text-prev', 'track-anim-enter');
