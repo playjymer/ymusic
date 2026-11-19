@@ -1869,6 +1869,7 @@ function togglePlayPause() {
 }
 
 function updatePlayState(playing) {
+  document.body.classList.toggle('audio-playing', !!playing);
   const playSvg = '<polygon points="8 5 19 12 8 19"></polygon>';
   const pauseSvg = '<rect x="6" y="4" width="3.5" height="16" rx="1.5"></rect><rect x="14.5" y="4" width="3.5" height="16" rx="1.5"></rect>';
   playPauseIcon.innerHTML = playing ? pauseSvg : playSvg;

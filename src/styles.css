@@ -4,40 +4,40 @@
    ========================================================================== */
 
 :root {
-  /* 1. M3 Tonal Surfaces (Dark Theme) */
-  --md-sys-color-background: #0f1013;
-  --md-sys-color-surface: #121316;
-  --md-sys-color-surface-dim: #111215;
-  --md-sys-color-surface-bright: #37393e;
-  --md-sys-color-surface-container-lowest: #0c0d10;
-  --md-sys-color-surface-container-low: #18191d;
-  --md-sys-color-surface-container: #1e1f24;
-  --md-sys-color-surface-container-high: #27282e;
-  --md-sys-color-surface-container-highest: #32333a;
-  --md-sys-color-surface-variant: #44464f;
+  /* 1. M3 Monet Tonal Surfaces (Google Pixel Warm Dark Theme) */
+  --md-sys-color-background: #131316;
+  --md-sys-color-surface: #131316;
+  --md-sys-color-surface-dim: #101013;
+  --md-sys-color-surface-bright: #39393e;
+  --md-sys-color-surface-container-lowest: #0e0e11;
+  --md-sys-color-surface-container-low: #1a1a1e;
+  --md-sys-color-surface-container: #202025;
+  --md-sys-color-surface-container-high: #2a2a30;
+  --md-sys-color-surface-container-highest: #35353c;
+  --md-sys-color-surface-variant: #49454f;
 
-  /* 2. M3 Content & Text Hierarchy */
-  --md-sys-color-on-background: #e4e2e6;
-  --md-sys-color-on-surface: #e4e2e6;
-  --md-sys-color-on-surface-variant: #c6c6ca;
-  --md-sys-color-outline: #8d8f96;
-  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.08);
+  /* 2. M3 Content & Text Hierarchy (Pixel Google Sans Hierarchy) */
+  --md-sys-color-on-background: #e6e1e6;
+  --md-sys-color-on-surface: #e6e1e6;
+  --md-sys-color-on-surface-variant: #cac4d0;
+  --md-sys-color-outline: #938f99;
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.05);
 
-  /* 3. M3 Vibrant Music Accents (YMusic Dynamic Coral Core) */
-  --md-sys-color-primary: #ff5436;
-  --md-sys-color-on-primary: #ffffff;
-  --md-sys-color-primary-container: rgba(255, 84, 54, 0.18);
-  --md-sys-color-on-primary-container: #ffdad3;
+  /* 3. Pixel Signature Dynamic Accent (Terracotta / Coral Peach) */
+  --md-sys-color-primary: #ff897d;
+  --md-sys-color-on-primary: #5c1407;
+  --md-sys-color-primary-container: #772b1d;
+  --md-sys-color-on-primary-container: #ffdad4;
 
   --md-sys-color-secondary: #e7bdb4;
   --md-sys-color-on-secondary: #442a24;
-  --md-sys-color-secondary-container: #463430;
-  --md-sys-color-on-secondary-container: #ffdad3;
+  --md-sys-color-secondary-container: #473a36;
+  --md-sys-color-on-secondary-container: #ffdbd3;
 
-  --md-sys-color-tertiary: #67d6ec;
-  --md-sys-color-on-tertiary: #00363d;
-  --md-sys-color-tertiary-container: rgba(103, 214, 236, 0.16);
-  --md-sys-color-on-tertiary-container: #9eeffd;
+  --md-sys-color-tertiary: #a8d5e2;
+  --md-sys-color-on-tertiary: #103642;
+  --md-sys-color-tertiary-container: #234853;
+  --md-sys-color-on-tertiary-container: #c4ecf9;
 
   /* Backward compatibility aliases */
   --bg-app: var(--md-sys-color-background);
@@ -49,21 +49,21 @@
   --bg-card-active: var(--md-sys-color-surface-container-highest);
 
   --border-subtle: var(--md-sys-color-outline-variant);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-hover: rgba(255, 255, 255, 0.12);
   --border-active: var(--md-sys-color-primary);
 
   --accent-brand: var(--md-sys-color-primary);
   --accent-amber: #ffb74d;
   --accent-cyan: var(--md-sys-color-tertiary);
-  --accent-gradient: linear-gradient(135deg, #ff5436 0%, #ff7d66 100%);
-  --accent-glow: rgba(255, 84, 54, 0.35);
+  --accent-gradient: linear-gradient(135deg, #ff897d 0%, #ffab91 100%);
+  --accent-glow: rgba(255, 137, 125, 0.35);
 
   --text-main: var(--md-sys-color-on-surface);
   --text-dim: var(--md-sys-color-on-surface-variant);
   --text-muted: var(--md-sys-color-outline);
 
-  --font-display: 'Unbounded', 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* 4. M3 Shape Scale (Corner Radii) */
@@ -161,21 +161,21 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 0%, #151829 0%, #08090e 65%);
+  background: var(--md-sys-color-background);
 }
 
 /* --------------------------------------------------------------------------
    2. CUSTOM TITLEBAR & INTEGRATED WINDOW CONTROLS
    -------------------------------------------------------------------------- */
 .custom-titlebar {
-  height: 44px;
-  min-height: 44px;
-  background: rgba(11, 13, 20, 0.98);
-  border-bottom: 1px solid var(--border-subtle);
+  height: 46px;
+  min-height: 46px;
+  background: var(--md-sys-color-surface);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 16px;
+  padding-left: 18px;
   z-index: 100;
   user-select: none;
 }
@@ -196,8 +196,8 @@ html, body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent-brand);
-  box-shadow: 0 0 10px var(--accent-brand);
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 10px var(--md-sys-color-primary);
   animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -209,32 +209,32 @@ html, body {
 
 .brand-text {
   font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--md-sys-color-on-surface);
 }
 
 .active-flow-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(252, 63, 29, 0.12);
-  border: 1px solid rgba(252, 63, 29, 0.3);
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-family: var(--font-mono);
+  background: var(--md-sys-color-secondary-container);
+  border: none;
+  padding: 4px 12px;
+  border-radius: var(--md-shape-full);
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
-  color: #ff6347;
-  letter-spacing: 0.5px;
+  color: var(--md-sys-color-on-secondary-container);
+  letter-spacing: 0.2px;
 }
 
 .flow-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-brand);
+  background: var(--md-sys-color-primary);
 }
 
 .titlebar-center {
@@ -253,10 +253,10 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  padding: 3px 10px 3px 4px;
-  border-radius: 20px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  padding: 4px 12px 4px 5px;
+  border-radius: var(--md-shape-full);
 }
 
 .user-avatar-small {
@@ -357,18 +357,19 @@ html, body {
 .menu-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .menu-label {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--md-sys-color-primary);
-  letter-spacing: 0.8px;
-  margin-bottom: 6px;
-  padding-left: 12px;
-  text-transform: uppercase;
+  letter-spacing: 0.1px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding-left: 14px;
+  text-transform: none; /* Google Pixel M3 sentence case */
 }
 
 /* M3 Navigation Item (Signature Pill Active State) */
@@ -448,19 +449,20 @@ html, body {
   border-radius: 4px;
 }
 
-/* M3 Filter Chips (Mood & Vibe) */
+/* M3 Filter Chips (Pixel Pill Style) */
 .vibe-pill {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 10px;
-  border-radius: var(--md-shape-md);
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--md-shape-full);
   background: var(--md-sys-color-surface-container);
   border: 1px solid var(--md-sys-color-outline-variant);
   color: var(--md-sys-color-on-surface-variant);
   font-family: var(--font-body);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s var(--ease-snappy);
@@ -470,16 +472,15 @@ html, body {
 .vibe-pill:hover {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
-  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
 }
 
 .vibe-pill.active {
-  background: var(--md-sys-color-primary-container) !important;
-  border-color: var(--md-sys-color-primary) !important;
-  color: var(--md-sys-color-on-primary-container) !important;
-  box-shadow: 0 2px 10px rgba(255, 84, 54, 0.25);
+  background: var(--md-sys-color-secondary-container) !important;
+  border-color: transparent !important;
+  color: var(--md-sys-color-on-secondary-container) !important;
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* M3 Elevated Volume Card */
@@ -723,7 +724,7 @@ body.in-main-view #dock-now-playing {
   position: relative;
   width: 216px;
   height: 216px;
-  border-radius: 20px;
+  border-radius: 24px;
   background: var(--md-sys-color-surface-container-highest);
   border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
@@ -740,7 +741,7 @@ body.in-main-view #dock-now-playing {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 18px;
+  border-radius: 24px;
   display: block;
 }
 
@@ -929,35 +930,34 @@ body.in-main-view #dock-now-playing {
 
 .station-meta-tag {
   font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 800;
-  color: #ff5230;
-  letter-spacing: 1.2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   user-select: none;
 }
 
 .track-title-heading {
   font-family: var(--font-display);
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.6px;
-  line-height: 1.15;
-  color: #ffffff;
-  margin-bottom: 8px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--md-sys-color-on-surface);
+  margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
 }
 
 .track-artist-heading {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
-  margin-bottom: 8px;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -965,12 +965,10 @@ body.in-main-view #dock-now-playing {
 
 .track-album-sub {
   font-family: var(--font-body);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.38);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  margin-bottom: 22px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-sys-color-outline);
+  margin-bottom: 20px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1204,7 +1202,7 @@ body.in-main-view #dock-now-playing {
 
 .scrubber-trough {
   flex: 1;
-  height: 6px;
+  height: 8px;
   background: var(--md-sys-color-surface-container-highest);
   border: none;
   border-radius: var(--md-shape-full);
@@ -1214,7 +1212,7 @@ body.in-main-view #dock-now-playing {
 }
 
 .scrubber-trough:hover {
-  height: 8px;
+  height: 10px;
 }
 
 .scrubber-active {
@@ -1227,6 +1225,21 @@ body.in-main-view #dock-now-playing {
   border-radius: var(--md-shape-full);
 }
 
+/* Iconic Google Pixel Squiggly Scrubber (Animated Sine Wave) */
+body.audio-playing .scrubber-active {
+  background-color: transparent !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 8px;
+  background-position-y: center;
+  animation: pixelSquiggly 1.2s linear infinite;
+}
+
+@keyframes pixelSquiggly {
+  0% { background-position-x: 0; }
+  100% { background-position-x: 20px; }
+}
+
 .scrubber-handle {
   position: absolute;
   top: 50%;
@@ -1235,7 +1248,7 @@ body.in-main-view #dock-now-playing {
   height: 14px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 10px rgba(255, 84, 54, 0.75);
+  box-shadow: 0 0 10px rgba(255, 137, 125, 0.75);
   transform: translate(-50%, -50%) scale(0.85);
   cursor: pointer;
   transition: transform 0.1s;
@@ -1254,8 +1267,8 @@ body.in-main-view #dock-now-playing {
 }
 
 .transport-btn {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--md-shape-full);
   background: transparent;
   border: 1px solid transparent;
@@ -1280,7 +1293,7 @@ body.in-main-view #dock-now-playing {
   color: var(--md-sys-color-tertiary) !important;
   border-color: var(--md-sys-color-tertiary) !important;
   background: var(--md-sys-color-tertiary-container) !important;
-  box-shadow: 0 0 12px rgba(103, 214, 236, 0.4);
+  box-shadow: 0 0 12px rgba(168, 213, 226, 0.4);
 }
 
 .transport-btn.btn-dj.is-mixing {
@@ -1318,11 +1331,11 @@ body.in-main-view #dock-now-playing {
 
 @keyframes djMixingGlow {
   0% {
-    box-shadow: 0 0 8px rgba(103, 214, 236, 0.4);
+    box-shadow: 0 0 8px rgba(168, 213, 226, 0.4);
     transform: scale(1.0);
   }
   100% {
-    box-shadow: 0 0 20px rgba(103, 214, 236, 0.9), 0 0 35px rgba(255, 84, 54, 0.5);
+    box-shadow: 0 0 20px rgba(168, 213, 226, 0.9), 0 0 35px rgba(255, 137, 125, 0.5);
     transform: scale(1.08);
   }
 }
@@ -1333,11 +1346,11 @@ body.in-main-view #dock-now-playing {
   transform: scale(1.08);
 }
 
-/* M3 Floating Action Button (Hero Play / Pause) */
+/* Google Pixel Signature Squircle Play / Pause Button */
 .play-hero-btn {
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 18px; /* Pixel iconic squircle */
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
   border: none;
@@ -1346,15 +1359,21 @@ body.in-main-view #dock-now-playing {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
-  transition: transform 0.2s var(--ease-snappy), background 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 137, 125, 0.4);
+  transition: transform 0.2s var(--ease-snappy), background 0.15s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
 }
 
 .play-hero-btn:hover {
   transform: scale(1.06);
+  border-radius: 20px;
   background: var(--md-sys-color-primary);
   filter: brightness(1.08);
-  box-shadow: 0 6px 20px rgba(255, 84, 54, 0.55);
+  box-shadow: 0 6px 22px rgba(255, 137, 125, 0.55);
+}
+
+.play-hero-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(255, 137, 125, 0.3);
 }
 
 .play-hero-btn:active {
@@ -3080,18 +3099,18 @@ body.in-main-view #dock-now-playing {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #ffffff;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.2s var(--ease-snappy);
 }
 
 .fs-lyrics-close-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--md-sys-color-surface-container-highest);
   transform: scale(1.08);
 }
 
@@ -3228,7 +3247,7 @@ body.in-main-view #dock-now-playing {
 .fs-play-btn {
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 18px; /* Pixel squircle */
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
   border: none;
@@ -3237,19 +3256,20 @@ body.in-main-view #dock-now-playing {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
-  transition: transform 0.2s var(--ease-snappy), box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 137, 125, 0.4);
+  transition: transform 0.2s var(--ease-snappy), box-shadow 0.2s ease, filter 0.2s ease, border-radius 0.2s ease;
 }
 
 .fs-play-btn:hover {
   transform: scale(1.06);
+  border-radius: 20px;
   filter: brightness(1.08);
-  box-shadow: 0 6px 20px rgba(255, 84, 54, 0.55);
+  box-shadow: 0 6px 22px rgba(255, 137, 125, 0.55);
 }
 
 .fs-play-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 2px 8px rgba(255, 84, 54, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 137, 125, 0.3);
 }
 
 .fs-play-btn:focus,
@@ -3260,6 +3280,15 @@ body.in-main-view #dock-now-playing {
 .fs-play-btn svg {
   margin-left: 0;
   display: block;
+}
+
+body.audio-playing #fs-progress-fill {
+  background-color: transparent !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='%23ff897d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: repeat-x !important;
+  background-size: 20px 8px !important;
+  background-position-y: center !important;
+  animation: pixelSquiggly 1.2s linear infinite !important;
 }
 
 .fs-scrubber-line {
