@@ -588,161 +588,58 @@ function renderQueue() {
   }
 }
 
-// --------------------------------------------------------------------------
-// ORGANIC WATER SPILL TRANSITION ENGINE ("РАЗЛИТАЯ ВОДА РАСТЕКАЕТСЯ ПО СТОЛУ")
-// --------------------------------------------------------------------------
-let waterSpillAnimId = null;
-
-function triggerOrganicWaterSpill(oldSrc, newSrc, direction = 'next') {
-  const canvas = document.getElementById('cover-water-canvas');
-  const dockCanvas = document.getElementById('dock-water-canvas');
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  const dockCtx = dockCanvas ? dockCanvas.getContext('2d') : null;
-
-  if (waterSpillAnimId) {
-    cancelAnimationFrame(waterSpillAnimId);
-    waterSpillAnimId = null;
-  }
-
-  if (!oldSrc || oldSrc === newSrc) return;
-
-  const imgOld = new Image();
-  imgOld.crossOrigin = 'anonymous';
-  imgOld.src = oldSrc;
-
-  const imgNew = new Image();
-  imgNew.crossOrigin = 'anonymous';
-  imgNew.src = newSrc;
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const isNext = direction !== 'prev';
-
-  // Water spill origin: splashes organically from the side and floods the surface
-  const originX = isNext ? w * 0.24 : w * 0.76;
-  const originY = h * 0.46;
-  const maxRadius = Math.hypot(w, h) * 1.18;
-
-  canvas.classList.add('is-spilling');
-  if (dockCanvas) dockCanvas.classList.add('is-spilling');
-
-  const duration = 1150; // 1.15 seconds: calm, unhurried, visible liquid flow
-  const startTime = performance.now();
-
-  function renderFrame(now) {
-    const elapsed = now - startTime;
-    const t = Math.min(1.0, elapsed / duration);
-
-    // Fluid deceleration: fast initial splash, then viscous spreading
-    const p = 1 - Math.pow(1 - t, 3.2);
-    const baseRadius = p * maxRadius;
-    const waveTime = elapsed * 0.005;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // 1. Draw old image (the table underneath)
-    if (imgOld.complete && imgOld.naturalWidth > 0) {
-      ctx.drawImage(imgOld, 0, 0, w, h);
-    }
-
-    if (dockCtx && dockCanvas) {
-      dockCtx.clearRect(0, 0, dockCanvas.width, dockCanvas.height);
-      if (imgOld.complete && imgOld.naturalWidth > 0) {
-        dockCtx.drawImage(imgOld, 0, 0, dockCanvas.width, dockCanvas.height);
-      }
-    }
-
-    // 2. Build organic wavy liquid puddle with 24 harmonic points
-    if (baseRadius > 1) {
-      ctx.save();
-      ctx.beginPath();
-      const numPoints = 24;
-      const points = [];
-
-      for (let i = 0; i < numPoints; i++) {
-        const angle = (i / numPoints) * Math.PI * 2;
-        // Fluid harmonics: natural liquid lobes & ripples
-        const wave1 = Math.sin(angle * 3 + waveTime * 3.6) * 0.11;
-        const wave2 = Math.cos(angle * 5 - waveTime * 2.8) * 0.07;
-        const wave3 = Math.sin(angle * 7 + waveTime * 4.4) * 0.035;
-        const r = Math.max(0, baseRadius * (1 + wave1 + wave2 + wave3));
-
-        points.push({
-          x: originX + Math.cos(angle) * r,
-          y: originY + Math.sin(angle) * r
-        });
-      }
-
-      ctx.moveTo((points[0].x + points[numPoints - 1].x) / 2, (points[0].y + points[numPoints - 1].y) / 2);
-      for (let i = 0; i < numPoints; i++) {
-        const nextIdx = (i + 1) % numPoints;
-        const midX = (points[i].x + points[nextIdx].x) / 2;
-        const midY = (points[i].y + points[nextIdx].y) / 2;
-        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
-      }
-      ctx.closePath();
-
-      // Clip and draw new image (the spilled water)
-      ctx.clip();
-      if (imgNew.complete && imgNew.naturalWidth > 0) {
-        ctx.drawImage(imgNew, 0, 0, w, h);
-      }
-      ctx.restore();
-
-      // 3. Draw wet glossy meniscus boundary
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo((points[0].x + points[numPoints - 1].x) / 2, (points[0].y + points[numPoints - 1].y) / 2);
-      for (let i = 0; i < numPoints; i++) {
-        const nextIdx = (i + 1) % numPoints;
-        const midX = (points[i].x + points[nextIdx].x) / 2;
-        const midY = (points[i].y + points[nextIdx].y) / 2;
-        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
-      }
-      ctx.closePath();
-
-      const edgeAlpha = Math.max(0, 1 - p * 0.95);
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = `rgba(255, 255, 255, ${edgeAlpha * 0.55})`;
-      ctx.stroke();
-
-      ctx.lineWidth = 14;
-      ctx.strokeStyle = `rgba(255, 255, 255, ${edgeAlpha * 0.20})`;
-      ctx.stroke();
-      ctx.restore();
-
-      // Sync to dock mini canvas
-      if (dockCtx && dockCanvas) {
-        dockCtx.drawImage(canvas, 0, 0, dockCanvas.width, dockCanvas.height);
-      }
-    }
-
-    if (t < 1.0) {
-      waterSpillAnimId = requestAnimationFrame(renderFrame);
-    } else {
-      waterSpillAnimId = null;
-      canvas.classList.remove('is-spilling');
-      if (dockCanvas) dockCanvas.classList.remove('is-spilling');
-      ctx.clearRect(0, 0, w, h);
-      if (dockCtx && dockCanvas) dockCtx.clearRect(0, 0, dockCanvas.width, dockCanvas.height);
-    }
-  }
-
-  waterSpillAnimId = requestAnimationFrame(renderFrame);
-}
-
 function setTrackPreview(track, direction = 'next') {
   if (!track) return;
   const cover = track.cover_url || 'assets/default-cover.svg';
 
-  const oldCover = trackCoverMain ? trackCoverMain.src : '';
-  if (oldCover && oldCover !== cover && !oldCover.endsWith('default-cover.svg')) {
-    triggerOrganicWaterSpill(oldCover, cover, direction);
+  const trackCoverBack = document.getElementById('track-cover-back');
+  const trackCoverMain = document.getElementById('track-cover-main');
+  const waterCrest = document.getElementById('water-crest');
+
+  const dockThumbBack = document.getElementById('dock-thumb-back');
+  const dockThumb = document.getElementById('dock-thumb');
+
+  const isNext = direction !== 'prev';
+  const coverCls = isNext ? 'anim-water-next' : 'anim-water-prev';
+  const crestCls = isNext ? 'anim-crest-next' : 'anim-crest-prev';
+  const dockThumbCls = isNext ? 'anim-dock-thumb-next' : 'anim-dock-thumb-prev';
+  const textCls = isNext ? 'anim-text-next' : 'anim-text-prev';
+  const dockMetaCls = isNext ? 'anim-dock-meta-next' : 'anim-dock-meta-prev';
+
+  // 1. Keep previous cover visible in the back layer (the table underneath)
+  if (trackCoverBack && trackCoverMain && trackCoverMain.src && !trackCoverMain.src.endsWith('default-cover.svg')) {
+    trackCoverBack.src = trackCoverMain.src;
+  }
+  if (dockThumbBack && dockThumb && dockThumb.src && !dockThumb.src.endsWith('default-cover.svg')) {
+    dockThumbBack.src = dockThumb.src;
   }
 
-  trackCoverMain.src = cover;
+  // 2. Preload new cover image so it NEVER flashes white or black before animating
+  const startTransition = () => {
+    if (trackCoverMain) trackCoverMain.src = cover;
+    if (dockThumb) dockThumb.src = cover;
+
+    if (trackCoverMain) trackCoverMain.classList.remove('anim-water-next', 'anim-water-prev');
+    if (waterCrest) waterCrest.classList.remove('anim-crest-next', 'anim-crest-prev');
+    if (dockThumb) dockThumb.classList.remove('anim-dock-thumb-next', 'anim-dock-thumb-prev');
+
+    requestAnimationFrame(() => {
+      if (trackCoverMain) trackCoverMain.classList.add(coverCls);
+      if (waterCrest) waterCrest.classList.add(crestCls);
+      if (dockThumb) dockThumb.classList.add(dockThumbCls);
+    });
+  };
+
+  const preloadImg = new Image();
+  preloadImg.src = cover;
+  if (preloadImg.complete) {
+    startTransition();
+  } else {
+    preloadImg.onload = startTransition;
+    preloadImg.onerror = startTransition;
+  }
+
+  // Typography update with smooth water wash
   trackTitleMain.textContent = track.title;
   
   if (typeof onTrackChangedForTheme === 'function') {
@@ -772,8 +669,7 @@ function setTrackPreview(track, direction = 'next') {
   trackAlbumMain.textContent = track.album ? `АЛЬБОМ: ${track.album.toUpperCase()}` : '';
   timeTotal.textContent = formatTime(track.duration_ms / 1000);
 
-  // Sync Universal Bottom Dock
-  if (dockThumb) dockThumb.src = cover;
+  // Sync Universal Bottom Dock text
   if (dockTitle) dockTitle.textContent = track.title;
   if (dockArtist) {
     dockArtist.innerHTML = '';
@@ -795,11 +691,6 @@ function setTrackPreview(track, direction = 'next') {
       }
     });
   }
-
-  // Pure GPU Composited Directional Transitions (Batched in single animation frame without layout reflows)
-  const isNext = direction !== 'prev';
-  const textCls = isNext ? 'anim-text-next' : 'anim-text-prev';
-  const dockMetaCls = isNext ? 'anim-dock-meta-next' : 'anim-dock-meta-prev';
 
   const dockMeta = document.getElementById('dock-meta');
   const infoDeck = document.querySelector('.track-info-deck');
@@ -3906,24 +3797,9 @@ function setupSpectrumVisualizer() {
   const peakVelocities = new Float32Array(bands);
 
   // Organic Living Wave State
-  const waveNodes = 28;
+  const waveNodes = 32;
   const waveHeights = new Float32Array(waveNodes);
   const waveHeightsBack = new Float32Array(waveNodes);
-
-  // Floating Ambient Particles (Wave Mode)
-  const particleCount = 24;
-  const particles = [];
-  for (let p = 0; p < particleCount; p++) {
-    particles.push({
-      x: Math.random(),
-      y: Math.random(),
-      radius: Math.random() * 2 + 1,
-      speedY: Math.random() * 0.003 + 0.0015,
-      driftX: (Math.random() - 0.5) * 0.002,
-      opacity: Math.random() * 0.7 + 0.2,
-      pulsePhase: Math.random() * Math.PI * 2
-    });
-  }
 
   let time = 0;
   let avgBass = 0.2;
@@ -4054,45 +3930,46 @@ function setupSpectrumVisualizer() {
     // Update organic wave nodes from frequency bands
     for (let i = 0; i < waveNodes; i++) {
       const normIdx = i / (waveNodes - 1); // 0.0 to 1.0
-      // Hann envelope: mathematically 0 at exact endpoints (x=0, x=w)
-      const windowEnv = Math.sin(normIdx * Math.PI);
+      // Gentle edge tapering at the very edges so the wave spans the full stage naturally
+      const edgeTaper = Math.sin(Math.min(1, Math.max(0, normIdx / 0.08)) * (Math.PI / 2)) *
+                        Math.sin(Math.min(1, Math.max(0, (1 - normIdx) / 0.08)) * (Math.PI / 2));
 
       let targetPrimary = 0;
       let targetBack = 0;
 
       if (hasReal) {
         // Map nodes across logarithmic frequency spectrum
-        const binStart = Math.min(220, Math.floor(Math.pow(normIdx, 1.45) * 160));
-        const binEnd = Math.min(230, binStart + 4);
+        const binStart = Math.min(220, Math.floor(Math.pow(normIdx, 1.35) * 160));
+        const binEnd = Math.min(235, binStart + 5);
         let bandSum = 0;
         for (let b = binStart; b <= binEnd; b++) {
           bandSum += freqs[b] || 0;
         }
         const bandMag = (bandSum / (binEnd - binStart + 1)) / 255.0;
 
-        // Fluid organic ripple
-        const primaryPhase = time * 2.2 + normIdx * 5.2;
-        const ripple = Math.sin(primaryPhase) * 0.12 * (mids + highs * 0.6);
+        // Fluid organic multi-harmonic ripples
+        const ripple1 = Math.sin(time * 2.5 + normIdx * 6.2) * 0.12 * (mids + highs * 0.5);
+        const ripple2 = Math.cos(time * 1.8 - normIdx * 4.4) * 0.08 * bass;
 
         // Beat kick response
-        const kickThrust = isBeat ? Math.min(0.5, beatDelta * 1.5 + bass * 0.25) : 0;
-        const rawSwell = (bandMag * 0.65 + bass * 0.28 + kickThrust + ripple) * windowEnv * maxAmp;
-        targetPrimary = Math.max(0, Math.min(maxAmp, rawSwell));
+        const kickThrust = isBeat ? Math.min(0.45, beatDelta * 1.4 + bass * 0.22) : 0;
+        const rawSwell = (bandMag * 0.65 + bass * (1 - normIdx * 0.5) * 0.32 + kickThrust + ripple1 + ripple2) * edgeTaper * maxAmp;
+        targetPrimary = Math.max(2, Math.min(maxAmp, rawSwell));
 
         // Secondary harmonic backing wave with gentle phase shift
-        const backPhase = time * 1.7 + normIdx * 4.4 + 0.8;
-        const backRipple = Math.cos(backPhase) * 0.12 * mids;
-        const rawBack = (bandMag * 0.45 + bass * 0.18 + backRipple) * windowEnv * (maxAmp * 0.68);
-        targetBack = Math.max(0, Math.min(maxAmp, rawBack));
+        const backRipple = Math.cos(time * 1.9 + normIdx * 5.0 + 1.0) * 0.14 * mids;
+        const rawBack = (bandMag * 0.45 + bass * 0.18 + backRipple) * edgeTaper * (maxAmp * 0.68);
+        targetBack = Math.max(1, Math.min(maxAmp * 0.72, rawBack));
       } else if (active) {
         // Gentle resting breath when idle or starting
-        targetPrimary = (Math.sin(time * 1.4 + normIdx * 4.2) * 0.5 + 0.5) * (maxAmp * 0.18) * windowEnv;
-        targetBack = (Math.cos(time * 1.1 + normIdx * 3.6) * 0.5 + 0.5) * (maxAmp * 0.14) * windowEnv;
+        const idleWave = (Math.sin(time * 1.4 + normIdx * 4.6) * 0.5 + 0.5);
+        targetPrimary = (idleWave * (maxAmp * 0.20) + 3) * edgeTaper;
+        targetBack = ((Math.cos(time * 1.1 + normIdx * 3.8) * 0.5 + 0.5) * (maxAmp * 0.15) + 2) * edgeTaper;
       }
 
       // Physics smoothing
-      const smoothFactorAttack = isBeat ? 0.82 : 0.65;
-      const smoothFactorDecay = 0.20;
+      const smoothFactorAttack = isBeat ? 0.80 : 0.65;
+      const smoothFactorDecay = 0.18;
 
       const fPrim = targetPrimary > waveHeights[i] ? smoothFactorAttack : smoothFactorDecay;
       waveHeights[i] += (targetPrimary - waveHeights[i]) * fPrim;
@@ -4106,13 +3983,13 @@ function setupSpectrumVisualizer() {
     const backPoints = [];
     for (let i = 0; i < waveNodes; i++) {
       const x = (i / (waveNodes - 1)) * w;
-      const primY = Math.max(8, baseline - waveHeights[i]);
-      const backY = Math.max(8, baseline - waveHeightsBack[i]);
+      const primY = Math.max(6, baseline - waveHeights[i]);
+      const backY = Math.max(6, baseline - waveHeightsBack[i]);
       primaryPoints.push({ x, y: primY });
       backPoints.push({ x, y: backY });
     }
 
-    function drawBezierWave(points) {
+    function traceCurve(points) {
       if (points.length < 2) return;
       specCtx.moveTo(points[0].x, points[0].y);
       for (let i = 0; i < points.length - 1; i++) {
@@ -4125,39 +4002,44 @@ function setupSpectrumVisualizer() {
 
     // Layer 1: Secondary Harmonic Aura Ribbon (Tertiary Theme Color)
     specCtx.beginPath();
-    drawBezierWave(backPoints);
+    traceCurve(backPoints);
     specCtx.strokeStyle = tertiaryColor;
-    specCtx.globalAlpha = active ? 0.38 : 0.18;
-    specCtx.lineWidth = 2.0;
+    specCtx.globalAlpha = active ? 0.35 : 0.15;
+    specCtx.lineWidth = 1.8;
     specCtx.stroke();
     specCtx.globalAlpha = 1.0;
 
-    // Layer 2: Soft Glowing Fill Under Primary Wave (Tapered to baseline)
+    // Layer 2: Soft Glowing Fill Under Primary Wave (Flawlessly connected to baseline)
     specCtx.beginPath();
     specCtx.moveTo(0, baseline);
-    drawBezierWave(primaryPoints);
+    specCtx.lineTo(primaryPoints[0].x, primaryPoints[0].y);
+    for (let i = 0; i < primaryPoints.length - 1; i++) {
+      const midX = (primaryPoints[i].x + primaryPoints[i + 1].x) / 2;
+      const midY = (primaryPoints[i].y + primaryPoints[i + 1].y) / 2;
+      specCtx.quadraticCurveTo(primaryPoints[i].x, primaryPoints[i].y, midX, midY);
+    }
+    specCtx.lineTo(primaryPoints[primaryPoints.length - 1].x, primaryPoints[primaryPoints.length - 1].y);
     specCtx.lineTo(w, baseline);
     specCtx.closePath();
 
     const fillGrad = specCtx.createLinearGradient(0, baseline - maxAmp, 0, baseline);
-    fillGrad.addColorStop(0, primaryColor + (active ? '40' : '15'));
-    fillGrad.addColorStop(0.65, tertiaryColor + (active ? '1a' : '08'));
+    fillGrad.addColorStop(0, primaryColor + (active ? '45' : '18'));
+    fillGrad.addColorStop(0.5, tertiaryColor + (active ? '20' : '0a'));
     fillGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     specCtx.fillStyle = fillGrad;
     specCtx.fill();
 
     // Layer 3: Vibrant Primary Wave Ribbon (Linear gradient along width)
     specCtx.beginPath();
-    drawBezierWave(primaryPoints);
+    traceCurve(primaryPoints);
 
     const strokeGrad = specCtx.createLinearGradient(0, 0, w, 0);
     strokeGrad.addColorStop(0, primaryColor);
-    strokeGrad.addColorStop(0.45, tertiaryColor);
-    strokeGrad.addColorStop(0.8, primaryColor);
-    strokeGrad.addColorStop(1, tertiaryColor);
+    strokeGrad.addColorStop(0.5, tertiaryColor);
+    strokeGrad.addColorStop(1, primaryColor);
 
     specCtx.strokeStyle = strokeGrad;
-    specCtx.lineWidth = Math.min(5, 2.5 + bass * 2.2);
+    specCtx.lineWidth = Math.min(4.5, 2.4 + bass * 2.0);
     specCtx.lineCap = 'round';
     specCtx.lineJoin = 'round';
     specCtx.stroke();

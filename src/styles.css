@@ -197,7 +197,7 @@ html, body {
   height: 8px;
   border-radius: 50%;
   background: var(--md-sys-color-primary);
-  box-shadow: 0 0 10px var(--md-sys-color-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -333,10 +333,11 @@ html, body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 268px 1fr;
+  grid-template-columns: 284px 1fr;
   gap: 14px;
   padding: 12px 14px;
   overflow: hidden;
+  transition: background-color 0.5s ease;
 }
 
 /* --------------------------------------------------------------------------
@@ -352,6 +353,7 @@ html, body {
   gap: 16px;
   min-height: 0;
   overflow: hidden;
+  transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
 .menu-section {
@@ -417,7 +419,7 @@ html, body {
   height: 7px;
   border-radius: 50%;
   background: var(--md-sys-color-primary);
-  box-shadow: 0 0 8px var(--md-sys-color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .menu-icon {
@@ -453,16 +455,16 @@ html, body {
 .vibe-pill {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 8px;
+  justify-content: flex-start;
+  gap: 6px;
+  height: 33px;
+  padding: 0 10px;
   border-radius: var(--md-shape-full);
   background: var(--md-sys-color-surface-container);
   border: 1px solid var(--md-sys-color-outline-variant);
   color: var(--md-sys-color-on-surface-variant);
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s var(--ease-snappy);
@@ -470,6 +472,14 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+
+.vibe-pill span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: left;
 }
 
 .vibe-pill:hover {
@@ -571,6 +581,7 @@ html, body {
   min-height: 0;
   overflow: hidden;
   position: relative;
+  transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
 .stage-views-area {
@@ -661,7 +672,7 @@ body.in-main-view #dock-now-playing {
   height: 6px;
   border-radius: 50%;
   background: var(--md-sys-color-primary);
-  box-shadow: 0 0 4px var(--md-sys-color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   animation: pulseDot 2.2s infinite ease-in-out;
 }
 
@@ -721,6 +732,7 @@ body.in-main-view #dock-now-playing {
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--md-shape-xl);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
 .cover-wrapper {
@@ -749,20 +761,25 @@ body.in-main-view #dock-now-playing {
   display: block;
 }
 
-.cover-water-canvas {
+.cover-img-back {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 24px;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.1s ease;
+  z-index: 1;
 }
 
-.cover-water-canvas.is-spilling {
-  opacity: 1;
+.cover-img-front {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.water-wave-crest {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
 }
 
 .cover-glow-shadow {
@@ -779,8 +796,175 @@ body.in-main-view #dock-now-playing {
 }
 
 /* --------------------------------------------------------------------------
-   WATER SPILL TRANSITIONS ("РАЗЛИТАЯ ВОДА РАСТЕКАЕТСЯ ПО СТОЛУ")
+   ORGANIC WATER WAVE TRANSITION ("РАЗЛИТАЯ ВОДА РАСТЕКАЕТСЯ ПО СТОЛУ")
    -------------------------------------------------------------------------- */
+
+@keyframes waterWaveNext {
+  0% {
+    clip-path: polygon(
+      0% 0%,
+      0% 0%,
+      0% 15%,
+      0% 30%,
+      0% 45%,
+      0% 60%,
+      0% 75%,
+      0% 90%,
+      0% 100%,
+      0% 100%
+    );
+    opacity: 0.95;
+  }
+  50% {
+    clip-path: polygon(
+      0% 0%,
+      58% 0%,
+      48% 15%,
+      63% 30%,
+      52% 45%,
+      66% 60%,
+      49% 75%,
+      61% 90%,
+      53% 100%,
+      0% 100%
+    );
+    opacity: 1;
+  }
+  100% {
+    clip-path: polygon(
+      0% 0%,
+      100% 0%,
+      100% 15%,
+      100% 30%,
+      100% 45%,
+      100% 60%,
+      100% 75%,
+      100% 90%,
+      100% 100%,
+      0% 100%
+    );
+    opacity: 1;
+  }
+}
+
+@keyframes waterWavePrev {
+  0% {
+    clip-path: polygon(
+      100% 0%,
+      100% 0%,
+      100% 15%,
+      100% 30%,
+      100% 45%,
+      100% 60%,
+      100% 75%,
+      100% 90%,
+      100% 100%,
+      100% 100%
+    );
+    opacity: 0.95;
+  }
+  50% {
+    clip-path: polygon(
+      100% 0%,
+      42% 0%,
+      52% 15%,
+      37% 30%,
+      48% 45%,
+      34% 60%,
+      51% 75%,
+      39% 90%,
+      47% 100%,
+      100% 100%
+    );
+    opacity: 1;
+  }
+  100% {
+    clip-path: polygon(
+      100% 0%,
+      0% 0%,
+      0% 15%,
+      0% 30%,
+      0% 45%,
+      0% 60%,
+      0% 75%,
+      0% 90%,
+      0% 100%,
+      100% 100%
+    );
+    opacity: 1;
+  }
+}
+
+.anim-water-next {
+  animation: waterWaveNext 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+  will-change: clip-path;
+}
+
+.anim-water-prev {
+  animation: waterWavePrev 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+  will-change: clip-path;
+}
+
+/* Wet Glistening Meniscus Crest Light Wave */
+@keyframes crestNext {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.25) 44%,
+      rgba(255, 255, 255, 0.8) 48%,
+      rgba(255, 255, 255, 0.25) 52%,
+      transparent 60%
+    );
+    background-size: 260% 100%;
+    background-position: 140% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    background-position: -60% 0;
+  }
+}
+
+@keyframes crestPrev {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      -90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.25) 44%,
+      rgba(255, 255, 255, 0.8) 48%,
+      rgba(255, 255, 255, 0.25) 52%,
+      transparent 60%
+    );
+    background-size: 260% 100%;
+    background-position: 140% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    background-position: -60% 0;
+  }
+}
+
+.anim-crest-next {
+  animation: crestNext 0.88s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+}
+
+.anim-crest-prev {
+  animation: crestPrev 0.88s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+}
 
 /* Water Flood Wash for Typography ("Волна плавно накрывает текст") */
 @keyframes textWaterWashNext {
@@ -812,12 +996,12 @@ body.in-main-view #dock-now-playing {
 }
 
 .anim-text-next {
-  animation: textWaterWashNext 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: textWaterWashNext 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
   will-change: clip-path, opacity;
 }
 
 .anim-text-prev {
-  animation: textWaterWashPrev 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: textWaterWashPrev 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
   will-change: clip-path, opacity;
 }
 
@@ -839,29 +1023,35 @@ body.in-main-view #dock-now-playing {
   display: block;
 }
 
-.dock-water-canvas {
+.dock-thumb-back {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.1s ease;
+  z-index: 1;
 }
 
-.dock-water-canvas.is-spilling {
-  opacity: 1;
+.dock-thumb-front {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.anim-dock-thumb-next {
+  animation: waterWaveNext 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+  will-change: clip-path;
+}
+
+.anim-dock-thumb-prev {
+  animation: waterWavePrev 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
+  will-change: clip-path;
 }
 
 .anim-dock-meta-next {
-  animation: textWaterWashNext 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: textWaterWashNext 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
   will-change: clip-path;
 }
 
 .anim-dock-meta-prev {
-  animation: textWaterWashPrev 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: textWaterWashPrev 0.85s cubic-bezier(0.2, 0.85, 0.25, 1.0) forwards !important;
   will-change: clip-path;
 }
 
@@ -1035,20 +1225,17 @@ body.in-main-view #dock-now-playing {
   animation: heartPop 0.3s var(--ease-bounce);
 }
 
-/* Cyan Note on Lyrics Pill (like Image 3) */
+/* Cyan Note on Lyrics Pill */
 .btn-pill-lyrics .lyrics-icon-note {
   color: #00e5ff;
   stroke: #00e5ff;
-}
-  border-color: rgba(0, 240, 255, 0.25);
-  background: rgba(0, 240, 255, 0.06);
 }
 
 .btn-action-icon.btn-lyrics-icon:hover {
   background: rgba(0, 240, 255, 0.18);
   border-color: rgba(0, 240, 255, 0.55);
   color: #00f0ff;
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 @keyframes heartPop {
@@ -1605,7 +1792,7 @@ body.audio-playing .scrubber-active {
   background: var(--md-sys-color-primary);
   border: none;
   color: var(--md-sys-color-on-primary);
-  box-shadow: 0 4px 14px rgba(255, 84, 54, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .fav-action-btn.primary:hover {
@@ -1617,7 +1804,7 @@ body.audio-playing .scrubber-active {
   color: var(--accent-brand) !important;
   border-color: var(--accent-brand) !important;
   background: rgba(252, 63, 29, 0.18) !important;
-  box-shadow: 0 0 10px rgba(252, 63, 29, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .console-track-row.is-active-playing {
@@ -2547,7 +2734,7 @@ body.audio-playing .scrubber-active {
 .dj-style-btn.active {
   background: rgba(0, 240, 255, 0.12) !important;
   border-color: #00f0ff !important;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .dj-style-title {
@@ -2767,14 +2954,14 @@ body.audio-playing .scrubber-active {
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   transition: all 0.2s var(--ease-snappy);
 }
 
 .btn-action-wave:hover {
   background: rgba(0, 240, 255, 0.22);
   transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 18px rgba(0, 240, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .artist-tabs-bar {
@@ -3054,7 +3241,7 @@ body.audio-playing .scrubber-active {
   background: rgba(0, 240, 255, 0.18) !important;
   color: #00f0ff !important;
   border-color: rgba(0, 240, 255, 0.5) !important;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .btn-action-round.btn-lyrics-pill {
@@ -3067,7 +3254,7 @@ body.audio-playing .scrubber-active {
   background: rgba(0, 240, 255, 0.20);
   border-color: rgba(0, 240, 255, 0.55);
   color: #ffffff;
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   transform: translateY(-1px);
 }
 
