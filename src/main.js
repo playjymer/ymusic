@@ -588,6 +588,9 @@ function renderQueue() {
   }
 }
 
+let currentDisplayCover = '';
+let transitionSessionId = 0;
+
 function setTrackPreview(track, direction = 'next') {
   if (!track) return;
   const cover = track.cover_url || 'assets/default-cover.svg';
@@ -598,6 +601,8 @@ function setTrackPreview(track, direction = 'next') {
 
   const dockThumbBack = document.getElementById('dock-thumb-back');
   const dockThumb = document.getElementById('dock-thumb');
+  const infoDeck = document.querySelector('.track-info-deck');
+  const dockMeta = document.querySelector('.dock-meta');
 
   const isNext = direction !== 'prev';
   const coverCls = isNext ? 'anim-water-next' : 'anim-water-prev';
@@ -607,27 +612,50 @@ function setTrackPreview(track, direction = 'next') {
   const dockMetaCls = isNext ? 'anim-dock-meta-next' : 'anim-dock-meta-prev';
 
   // 1. Keep previous cover visible in the back layer (the table underneath)
-  if (trackCoverBack && trackCoverMain && trackCoverMain.src && !trackCoverMain.src.endsWith('default-cover.svg')) {
-    trackCoverBack.src = trackCoverMain.src;
+  if (trackCoverBack) {
+    if (currentDisplayCover) {
+      trackCoverBack.src = currentDisplayCover;
+    } else if (trackCoverMain && trackCoverMain.src && !trackCoverMain.src.endsWith('default-cover.svg')) {
+      trackCoverBack.src = trackCoverMain.src;
+    }
   }
-  if (dockThumbBack && dockThumb && dockThumb.src && !dockThumb.src.endsWith('default-cover.svg')) {
-    dockThumbBack.src = dockThumb.src;
+  if (dockThumbBack) {
+    if (currentDisplayCover) {
+      dockThumbBack.src = currentDisplayCover;
+    } else if (dockThumb && dockThumb.src && !dockThumb.src.endsWith('default-cover.svg')) {
+      dockThumbBack.src = dockThumb.src;
+    }
   }
+
+  currentDisplayCover = cover;
+  const sessionId = ++transitionSessionId;
 
   // 2. Preload new cover image so it NEVER flashes white or black before animating
   const startTransition = () => {
+    if (sessionId !== transitionSessionId) return;
+
     if (trackCoverMain) trackCoverMain.src = cover;
     if (dockThumb) dockThumb.src = cover;
 
+    // Reset old animation classes
     if (trackCoverMain) trackCoverMain.classList.remove('anim-water-next', 'anim-water-prev');
     if (waterCrest) waterCrest.classList.remove('anim-crest-next', 'anim-crest-prev');
     if (dockThumb) dockThumb.classList.remove('anim-dock-thumb-next', 'anim-dock-thumb-prev');
+    if (infoDeck) infoDeck.classList.remove('anim-text-next', 'anim-text-prev');
+    if (dockMeta) dockMeta.classList.remove('anim-dock-meta-next', 'anim-dock-meta-prev');
 
-    requestAnimationFrame(() => {
-      if (trackCoverMain) trackCoverMain.classList.add(coverCls);
-      if (waterCrest) waterCrest.classList.add(crestCls);
-      if (dockThumb) dockThumb.classList.add(dockThumbCls);
-    });
+    // Force browser reflow to GUARANTEE CSS animation restarts 100% of the time!
+    if (trackCoverMain) void trackCoverMain.offsetWidth;
+    if (infoDeck) void infoDeck.offsetWidth;
+    if (dockThumb) void dockThumb.offsetWidth;
+    if (dockMeta) void dockMeta.offsetWidth;
+
+    // Trigger animations
+    if (trackCoverMain) trackCoverMain.classList.add(coverCls);
+    if (waterCrest) waterCrest.classList.add(crestCls);
+    if (dockThumb) dockThumb.classList.add(dockThumbCls);
+    if (infoDeck) infoDeck.classList.add(textCls);
+    if (dockMeta) dockMeta.classList.add(dockMetaCls);
   };
 
   const preloadImg = new Image();
@@ -638,6 +666,14 @@ function setTrackPreview(track, direction = 'next') {
     preloadImg.onload = startTransition;
     preloadImg.onerror = startTransition;
   }
+
+  // When animation finishes, sync back layer so next track has current cover as the table
+  setTimeout(() => {
+    if (sessionId === transitionSessionId) {
+      if (trackCoverBack) trackCoverBack.src = cover;
+      if (dockThumbBack) dockThumbBack.src = cover;
+    }
+  }, 900);
 
   // Typography update with smooth water wash
   trackTitleMain.textContent = track.title;
@@ -691,17 +727,6 @@ function setTrackPreview(track, direction = 'next') {
       }
     });
   }
-
-  const dockMeta = document.getElementById('dock-meta');
-  const infoDeck = document.querySelector('.track-info-deck');
-
-  if (infoDeck) infoDeck.classList.remove('anim-text-next', 'anim-text-prev', 'track-anim-enter');
-  if (dockMeta) dockMeta.classList.remove('anim-dock-meta-next', 'anim-dock-meta-prev');
-
-  requestAnimationFrame(() => {
-    if (infoDeck) infoDeck.classList.add(textCls);
-    if (dockMeta) dockMeta.classList.add(dockMetaCls);
-  });
 
   // Update MediaSession & Windows SMTC Overlay
   updateMediaSession(track);
